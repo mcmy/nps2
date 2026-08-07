@@ -2,11 +2,13 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'release/v*'
+    branches:
       - 'dev/v*'
+    tags:
+      - 'v*'
 
 permissions:
+  actions: write
   contents: write
   packages: write
 
@@ -15,7 +17,7 @@ jobs:
     name: Build release archives
     runs-on: ubuntu-latest
     steps:
-      - name: Check out tagged source
+      - name: Check out source
         uses: actions/checkout@v7
 
       - name: Set up Go
@@ -49,15 +51,22 @@ jobs:
           path: '*.tar.gz'
           if-no-files-found: error
 
+      - name: Cancel workflow on failure
+        if: ${{ failure() }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh run cancel "$GITHUB_RUN_ID" || true
+
   build-docker:
     name: Build and push ${{ matrix.image }} image
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         image: [nps, npc]
     steps:
-      - name: Check out tagged source
+      - name: Check out source
         uses: actions/checkout@v7
 
       - name: Resolve image tag
@@ -65,22 +74,18 @@ jobs:
         shell: bash
         run: |
           ref="$GITHUB_REF_NAME"
-          case "$ref" in
-            release/v*)
-              version="${ref#release/}"
-              image_tag="$version"
-              channel="stable"
-              ;;
-            dev/v*)
-              version="${ref#dev/}"
-              image_tag="dev"
-              channel="dev"
-              ;;
-            *)
-              echo "Unsupported tag: $ref" >&2
-              exit 1
-              ;;
-          esac
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$ref" == v* ]]; then
+            version="$ref"
+            image_tag="${ref//\//-}"
+            channel="stable"
+          elif [[ "$GITHUB_REF_TYPE" == "branch" && "$ref" == dev/v* ]]; then
+            version="${ref#dev/}"
+            image_tag="dev"
+            channel="dev"
+          else
+            echo "Unsupported ref: $GITHUB_REF" >&2
+            exit 1
+          fi
 
           echo "channel=$channel" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -172,12 +177,19 @@ jobs:
           path: dist/release/*.tar.gz
           if-no-files-found: error
 
+      - name: Cancel workflow on failure
+        if: ${{ failure() }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh run cancel "$GITHUB_RUN_ID" || true
+
   publish-release:
     name: Publish GitHub Release
     needs: [build-release, build-docker]
     runs-on: ubuntu-latest
     steps:
-      - name: Check out tagged source
+      - name: Check out source
         uses: actions/checkout@v7
 
       - name: Download release archives
@@ -192,22 +204,18 @@ jobs:
         shell: bash
         run: |
           ref="$GITHUB_REF_NAME"
-          case "$ref" in
-            release/v*)
-              version="${ref#release/}"
-              channel_tag="latest"
-              channel="stable"
-              ;;
-            dev/v*)
-              version="${ref#dev/}"
-              channel_tag="pre"
-              channel="dev"
-              ;;
-            *)
-              echo "Unsupported tag: $ref" >&2
-              exit 1
-              ;;
-          esac
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$ref" == v* ]]; then
+            version="$ref"
+            channel_tag="latest"
+            channel="stable"
+          elif [[ "$GITHUB_REF_TYPE" == "branch" && "$ref" == dev/v* ]]; then
+            version="${ref#dev/}"
+            channel_tag="pre"
+            channel="dev"
+          else
+            echo "Unsupported ref: $GITHUB_REF" >&2
+            exit 1
+          fi
           echo "channel=$channel" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "channel_tag=$channel_tag" >> "$GITHUB_OUTPUT"
@@ -288,3 +296,10 @@ jobs:
           files: dist/release/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cancel workflow on failure
+        if: ${{ failure() }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh run cancel "$GITHUB_RUN_ID" || true
