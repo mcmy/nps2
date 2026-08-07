@@ -57,7 +57,7 @@ function AppContent() {
       <div className="sidebar-foot"><div className="identity"><strong>{discovery.session.username || t('已认证用户')}</strong><span>{discovery.session.is_admin ? t('系统管理员') : discovery.session.kind || t('用户')}</span></div></div>
     </aside>
     <main className="main"><header className="topbar"><button className="icon-btn mobile-menu" onClick={() => setMobileOpen(true)} aria-label={t('打开菜单')}><Menu /></button><span className="topbar-title">{currentInfo && t(currentInfo.label)}</span><div className="topbar-actions">
-      <a className="icon-btn" href="https://d-jy.net/docs/nps/" target="_blank" rel="noreferrer" title={t('帮助')} aria-label={t('帮助')}><CircleHelp /></a>
+      <a className="icon-btn" href="https://github.com/mcmy/nps2" target="_blank" rel="noreferrer" title={t('帮助')} aria-label={t('帮助')}><CircleHelp /></a>
       <button className="icon-btn" onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')} title={language === 'zh' ? 'English' : '中文'} aria-label={t('切换语言')}><Languages /></button>
       <button className="icon-btn" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} title={t('切换主题')} aria-label={t('切换主题')}>{theme === 'light' ? <Moon /> : <Sun />}</button>
       <button className="icon-btn" onClick={() => void logout()} title={t('退出登录')} aria-label={t('退出登录')}><LogOut /></button>

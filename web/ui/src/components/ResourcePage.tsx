@@ -210,10 +210,11 @@ function ResourceEditor({ discovery, actions, spec, item, creating = false, busy
     const entry = actions.get('clients:list');
     if (!entry) return;
     let active = true;
-    request<ResourceList | AnyRecord[]>(`${entry.path}?offset=0&limit=0&order=asc`)
+    request<ResourceList | AnyRecord[]>(`${entry.path}?offset=0&limit=0&order=asc`, { method: entry.method })
       .then(data => {
         if (!active) return;
-        const clients = Array.isArray(data) ? data : data.items || [];
+        const clients = (Array.isArray(data) ? data : data.items || (data as AnyRecord).rows || [])
+          .map(client => normalizeLegacyKeys(client) as AnyRecord);
         const options = clients.map(client => ({ value: Number(client.id), label: client.remark ? `${client.id} · ${client.remark}` : String(client.id) }));
         if (item?.client_id && !options.some(option => Number(option.value) === Number(item.client_id))) options.unshift({ value: Number(item.client_id), label: String(item.client_id) });
         setClientOptions(options);
@@ -227,7 +228,7 @@ function ResourceEditor({ discovery, actions, spec, item, creating = false, busy
     if (!entry) return;
     let active = true;
     const timer = window.setTimeout(() => {
-      request<any>(`${entry.path}?host=${encodeURIComponent(hostName.trim())}${item?.id ? `&exclude_id=${item.id}` : ''}`)
+      request<any>(`${entry.path}?host=${encodeURIComponent(hostName.trim())}${item?.id ? `&exclude_id=${item.id}` : ''}`, { method: entry.method })
         .then(data => { if (active) setCertSuggestion(data?.item || data || null); })
         .catch(() => { if (active) setCertSuggestion(null); });
     }, 300);
@@ -254,7 +255,7 @@ function ResourceDetailsDrawer({ discovery, actions, spec, item, notify, onMutat
     if (overviewURL) request<any>(overviewURL).then(data => { if (active) setRuntime(data?.registration || data || {}); }).catch(() => {});
     if (spec.resource !== 'clients' && item.client_id) {
       const entry = actions.get('clients:read');
-      if (entry) request<any>(materialize(entry.path, { id: item.client_id })).then(data => { if (active) setClient(data?.item || data || null); }).catch(() => {});
+      if (entry) request<any>(materialize(entry.path, { id: item.client_id }), { method: entry.method }).then(data => { if (active) setClient(normalizeLegacyKeys(data?.item || data || null) as AnyRecord); }).catch(() => {});
     }
     return () => { active = false; };
   }, [actions, discovery.routes, item, spec.resource]);
@@ -374,8 +375,12 @@ function ClientConnectionsDrawer({ item, actions, notify, onClose }: { item: Any
     if (!entry) return;
     let active = true;
     setLoading(true);
-    request<ResourceList | AnyRecord[]>(materialize(entry.path, { id: item.id }))
-      .then(data => { if (active) setConnections(Array.isArray(data) ? data : data.items || []); })
+    request<ResourceList | AnyRecord[]>(materialize(entry.path, { id: item.id }), { method: entry.method })
+      .then(data => {
+        if (!active) return;
+        const rows = Array.isArray(data) ? data : data.items || (data as AnyRecord).rows || [];
+        setConnections(rows.map(connection => normalizeLegacyKeys(connection) as AnyRecord));
+      })
       .catch(error => notify((error as Error).message, 'error'))
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
@@ -456,6 +461,7 @@ function renderCell(item: AnyRecord, key: string, kind = '', t: (value: string) 
   }
   if (kind === 'bytes') return <span className="mono">{formatBytes(Number(value || 0), key.includes('rate'))}{key.includes('rate') && '/s'}</span>;
   if (kind === 'time') return value ? new Date(Number(value) * 1000).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : t('无限制');
+  if (kind === 'client') return String(item.client?.remark || value || '-');
   if (kind === 'mono' || kind === 'id' || kind === 'number') return <span className="mono">{String(value ?? '-')}</span>;
   if (kind === 'mode') return <span className="badge mode-badge">{modeLabel(value, t)}</span>;
   return String(value ?? '-');

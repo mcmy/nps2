@@ -100,7 +100,7 @@ export const resourceSpecs: Record<string, ResourceSpec> = {
     searchKeys: ['id', 'remark', 'mode', 'target', 'port', 'client_id'],
     columns: [
       { key: 'id', label: 'ID', kind: 'id' }, { key: 'remark', label: '备注', kind: 'title' },
-      { key: 'mode', label: '模式', kind: 'mode' }, { key: 'client_id', label: '客户端', kind: 'id' },
+      { key: 'mode', label: '模式', kind: 'mode' }, { key: 'client_id', label: '客户端', kind: 'client' },
       { key: 'port', label: '服务端口', kind: 'number' }, { key: 'target', label: '目标', kind: 'mono' },
       { key: 'run_status', label: '状态', kind: 'online' }, { key: 'now_rate_total_bps', label: '实时速率', kind: 'bytes' },
       { key: 'service_total_bytes', label: '累计流量', kind: 'bytes' },
