@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/beego/beego"
-	"github.com/djylb/nps/lib/logs"
-	"github.com/djylb/nps/lib/mux"
-	"github.com/djylb/nps/lib/pmux"
+	"github.com/mcmy/nps2/lib/logs"
+	"github.com/mcmy/nps2/lib/mux"
+	"github.com/mcmy/nps2/lib/pmux"
 )
 
 var pMux *pmux.PortMux

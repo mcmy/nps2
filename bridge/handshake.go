@@ -9,14 +9,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/conn"
-	"github.com/djylb/nps/lib/crypt"
-	"github.com/djylb/nps/lib/file"
-	"github.com/djylb/nps/lib/logs"
-	"github.com/djylb/nps/lib/mux"
-	"github.com/djylb/nps/lib/version"
-	"github.com/djylb/nps/server/connection"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/conn"
+	"github.com/mcmy/nps2/lib/crypt"
+	"github.com/mcmy/nps2/lib/file"
+	"github.com/mcmy/nps2/lib/logs"
+	"github.com/mcmy/nps2/lib/mux"
+	"github.com/mcmy/nps2/lib/version"
+	"github.com/mcmy/nps2/server/connection"
 	"github.com/quic-go/quic-go"
 )
 

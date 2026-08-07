@@ -41,7 +41,7 @@
 - 更新相关依赖包
 
 ### v0.34.4 (2026-02-12)
-- 添加登录限制配置参数，支持网页管理登录封禁 [#209](https://github.com/djylb/nps/pull/209) (感谢[Yourdaylight](https://github.com/Yourdaylight))
+- 添加登录限制配置参数，支持网页管理登录封禁 [#209](https://github.com/mcmy/nps2/pull/209) (感谢[Yourdaylight](https://github.com/Yourdaylight))
 - 添加强制刷新封禁列表按钮
 - 调整页面显示
 
@@ -58,9 +58,9 @@
 - 更新相关依赖包
 
 ### v0.34.0 (2026-02-02)
-- 增强P2P打洞能力（不再兼容旧版） [#198](https://github.com/djylb/nps/pull/198) (感谢[cr4n5](https://github.com/cr4n5))
+- 增强P2P打洞能力（不再兼容旧版） [#198](https://github.com/mcmy/nps2/pull/198) (感谢[cr4n5](https://github.com/cr4n5))
 - 避免连接过程超时断连
-- 混合代理添加白名单功能 [#205](https://github.com/djylb/nps/pull/205) (感谢[Yourdaylight](https://github.com/Yourdaylight))
+- 混合代理添加白名单功能 [#205](https://github.com/mcmy/nps2/pull/205) (感谢[Yourdaylight](https://github.com/Yourdaylight))
 - 混合代理同时支持黑白名单功能
 - P2P优先使用IPv6直连
 - 优化P2P处理性能
@@ -70,8 +70,8 @@
 
 ### v0.33.14 (2026-01-22)
 - 调整限速逻辑
-- 修复pprof配置不生效 [#199](https://github.com/djylb/nps/issues/199)
-- 优化程序稳定性 [#201](https://github.com/djylb/nps/pull/201)
+- 修复pprof配置不生效 [#199](https://github.com/mcmy/nps2/issues/199)
+- 优化程序稳定性 [#201](https://github.com/mcmy/nps2/pull/201)
 - 优化高压转发场景
 - 更新相关依赖包
 
@@ -143,7 +143,7 @@
 - 升级GO至1.25
 
 ### v0.33.2 (2025-09-05)
-- 修复深色背景下分页按钮为浅色背景问题 [#149](https://github.com/djylb/nps/pull/149)
+- 修复深色背景下分页按钮为浅色背景问题 [#149](https://github.com/mcmy/nps2/pull/149)
 - 添加P2P打洞重试次数限制
 - 更新相关依赖包
 
@@ -166,13 +166,13 @@
 ### v0.32.10 (2025-08-26)
 - 添加调试日志输出
 - 优化P2P连接释放
-- 修复深色主题下浅色加载背景 [#142](https://github.com/djylb/nps/issues/142)
+- 修复深色主题下浅色加载背景 [#142](https://github.com/mcmy/nps2/issues/142)
 - 避免深色主题切换页面闪烁
 - 自动跟随浏览器默认主题
 - 允许配置KeepAlive间隔
 
 ### v0.32.9 (2025-08-25)
-- 避免下载过程中被阻断导致绕过换源 [#139](https://github.com/djylb/nps/issues/139)
+- 避免下载过程中被阻断导致绕过换源 [#139](https://github.com/mcmy/nps2/issues/139)
 - 优化P2P断连检测逻辑
 - 调整重复隧道检查逻辑
 - 更新相关依赖包
@@ -184,22 +184,22 @@
 - 更新相关依赖包
 
 ### v0.32.7 (2025-08-18)
-- 避免状态获取失败引起崩溃 [#133](https://github.com/djylb/nps/issues/133)
+- 避免状态获取失败引起崩溃 [#133](https://github.com/mcmy/nps2/issues/133)
 - 优化状态获取性能
-- 修复IPv6地址显示 [#135](https://github.com/djylb/nps/issues/135)
+- 修复IPv6地址显示 [#135](https://github.com/mcmy/nps2/issues/135)
 
 ### v0.32.6 (2025-08-18)
-- 重构状态获取函数 [#134](https://github.com/djylb/nps/issues/134)
+- 重构状态获取函数 [#134](https://github.com/mcmy/nps2/issues/134)
 
 ### v0.32.5 (2025-08-17)
-- 避免状态获取失败引起崩溃 [#133](https://github.com/djylb/nps/issues/133)
+- 避免状态获取失败引起崩溃 [#133](https://github.com/mcmy/nps2/issues/133)
 
 ### v0.32.4 (2025-08-12)
 - 避免注释影响配置文件解析
 - 修复时区不生效
 
 ### v0.32.3 (2025-08-12)
-- 支持使用代理更新 [#128](https://github.com/djylb/nps/issues/128)
+- 支持使用代理更新 [#128](https://github.com/mcmy/nps2/issues/128)
 - 调整日志输出
 - 优化ACK检查逻辑
 - 添加时区配置支持
@@ -311,7 +311,7 @@
 - 优化网络包传输
 
 ### v0.29.37 (2025-07-17)
-- 修复非RSA证书导致解密错误 [#109](https://github.com/djylb/nps/issues/109)
+- 修复非RSA证书导致解密错误 [#109](https://github.com/mcmy/nps2/issues/109)
 - 调整延迟检查逻辑
 - 更新相关依赖包
 
@@ -364,11 +364,11 @@
 ### v0.29.28 (2025-06-26)
 - 域名转发支持 HTTP/3
 - 更新相关依赖包
-- 避免插入Connection: close [#102](https://github.com/djylb/nps/issues/102)
+- 避免插入Connection: close [#102](https://github.com/mcmy/nps2/issues/102)
 
 ### v0.29.27 (2025-06-25)
 - 调整UDP的Proxy Protocol处理逻辑
-- 允许bridge端口全部为0 [#100](https://github.com/djylb/nps/issues/100)
+- 允许bridge端口全部为0 [#100](https://github.com/mcmy/nps2/issues/100)
 
 ### v0.29.26 (2025-06-25)
 - 添加QUIC连接方式
@@ -388,7 +388,7 @@
 
 ### v0.29.24 (2025-06-23)
 - 自动生成唯一标识密钥
-- UDP添加Proxy Protocol支持 [#99](https://github.com/djylb/nps/issues/99)
+- UDP添加Proxy Protocol支持 [#99](https://github.com/mcmy/nps2/issues/99)
 
 ### v0.29.23 (2025-06-20)
 - Docker添加CA证书
@@ -396,7 +396,7 @@
 - 允许自定义页面显示
 
 ### v0.29.22 (2025-06-19)
-- 修复禁用客户端失效 [#97](https://github.com/djylb/nps/issues/97)
+- 修复禁用客户端失效 [#97](https://github.com/mcmy/nps2/issues/97)
 - 虚拟客户端支持禁用
 
 ### v0.29.21 (2025-06-11)
@@ -408,7 +408,7 @@
 ### v0.29.20 (2025-06-10)
 - 头部替换支持变量替换 [具体说明](https://d-jy.net/docs/nps/#/feature?id=%e8%87%aa%e5%ae%9a%e4%b9%89%e8%af%b7%e6%b1%82-header)
 - 避免重复添加 X-Forwarded-For
-- 修复上游错误导致发布失败 [#93](https://github.com/djylb/nps/issues/93)
+- 修复上游错误导致发布失败 [#93](https://github.com/mcmy/nps2/issues/93)
 
 ### v0.29.19 (2025-06-09)
 - 默认添加 X-Forwarded-Proto 请求头
@@ -416,13 +416,13 @@
 - 管理页面支持 X-NPS-Http-Only 头
 
 ### v0.29.18 (2025-06-08)
-- 调整字体 [#90](https://github.com/djylb/nps/pull/90) (感谢[yhl452493373](https://github.com/yhl452493373))
-- 登录表单非空时允许提交 [#89](https://github.com/djylb/nps/issues/89)
+- 调整字体 [#90](https://github.com/mcmy/nps2/pull/90) (感谢[yhl452493373](https://github.com/yhl452493373))
+- 登录表单非空时允许提交 [#89](https://github.com/mcmy/nps2/issues/89)
 - 更新相关依赖
 
 ### v0.29.17 (2025-06-07)
 - NPC配置文件支持兼容模式
-- 调整页面显示 [#87](https://github.com/djylb/nps/pull/87) (感谢[yhl452493373](https://github.com/yhl452493373))
+- 调整页面显示 [#87](https://github.com/mcmy/nps2/pull/87) (感谢[yhl452493373](https://github.com/yhl452493373))
 - 添加连接数、流量统计
 - 清空统计信息时保持隧道连接
 - 添加隧道级别连接数统计
@@ -437,10 +437,10 @@
 - 域名转发添加 CONNECT 支持
 
 ### v0.29.15 (2025-06-05)
-- 调整相对路径处理逻辑 [#82](https://github.com/djylb/nps/issues/82)
-- 记录登录日志 [#81](https://github.com/djylb/nps/issues/81)
+- 调整相对路径处理逻辑 [#82](https://github.com/mcmy/nps2/issues/82)
+- 记录登录日志 [#81](https://github.com/mcmy/nps2/issues/81)
 - 添加获取证书公钥接口
-- 修复安装替换文件逻辑 [#83](https://github.com/djylb/nps/issues/83)
+- 修复安装替换文件逻辑 [#83](https://github.com/mcmy/nps2/issues/83)
 
 ### v0.29.14 (2025-06-04)
 - 添加备用CDN下载更新
@@ -458,7 +458,7 @@
 
 ### v0.29.11 (2025-05-27)
 - 避免每次TLS重新握手
-- 支持自动申请SSL证书 [#54](https://github.com/djylb/nps/issues/54)
+- 支持自动申请SSL证书 [#54](https://github.com/mcmy/nps2/issues/54)
 - 调整域名转发匹配逻辑
 - 调整掉线检测逻辑
 
@@ -499,7 +499,7 @@
 
 ### v0.29.3 (2025-05-20)
 - 客户端参数缺失端口时使用默认端口
-- 调整仪表盘显示内容 [#16](https://github.com/djylb/nps/issues/16)
+- 调整仪表盘显示内容 [#16](https://github.com/mcmy/nps2/issues/16)
 - 修复英文翻译错误
 
 ### v0.29.2 (2025-05-19)
@@ -522,7 +522,7 @@
 
 ### v0.29.0 (2025-05-19)
 - 合并HTTP代理和Socks5代理为混合代理
-- 美化Web界面 （参考 [#76](https://github.com/djylb/nps/issues/76) 感谢 [arch3rPro](https://github.com/arch3rPro)）
+- 美化Web界面 （参考 [#76](https://github.com/mcmy/nps2/issues/76) 感谢 [arch3rPro](https://github.com/arch3rPro)）
 - 支持明暗主题切换
 - 修复注册验证码校验
 - 优化TCP释放逻辑
@@ -542,10 +542,10 @@
 - 延长时间校验窗口
 - 完善服务端日志输出
 - 重写HTTP正向代理
-- 支持同一端口监听HTTP/Socks5代理 [#56](https://github.com/djylb/nps/issues/56)
+- 支持同一端口监听HTTP/Socks5代理 [#56](https://github.com/mcmy/nps2/issues/56)
 
 ### v0.28.2 (2025-05-15)
-- 修复HTTP正向代理 [#75](https://github.com/djylb/nps/issues/75)
+- 修复HTTP正向代理 [#75](https://github.com/mcmy/nps2/issues/75)
 
 ### v0.28.1 (2025-05-15)
 - 客户端加密校验证书
@@ -556,15 +556,15 @@
 - 优化域名解析速度
 
 ### v0.27.0 (2025-05-14)
-- 启用隧道添加端口检查 [#74](https://github.com/djylb/nps/issues/74)
+- 启用隧道添加端口检查 [#74](https://github.com/mcmy/nps2/issues/74)
 - NPS添加`secure_mode`选项，开启后不再支持旧版客户端
 - NPC添加`proto_version`选项，如需连接旧版服务器需要配置`-proto_version=0`
 - 重写客户端连接协议，防止探测、重放攻击等 （系统时间需要配置正确，依赖系统时间）
 - 更换哈希算法
 - 增加记录客户端本地IP地址
 - 修复最快IP解析
-- HTTP正向代理使用相对路径 [#75](https://github.com/djylb/nps/issues/75)
-- 新增WS、WSS方式连接服务端 [#71](https://github.com/djylb/nps/issues/71)
+- HTTP正向代理使用相对路径 [#75](https://github.com/mcmy/nps2/issues/75)
+- 新增WS、WSS方式连接服务端 [#71](https://github.com/mcmy/nps2/issues/71)
 - 客户端服务器双向认证
 - 允许独立配置连接协议
 - 网页添加命令行提示
@@ -579,14 +579,14 @@
 - 文档添加自动翻译
 - 重写日志输出模块
 - 修复日志轮换功能
-- 修复日志权限问题 [#70](https://github.com/djylb/nps/issues/70)
+- 修复日志权限问题 [#70](https://github.com/mcmy/nps2/issues/70)
 - 更新上游依赖
 
 ### v0.26.54 (2025-05-02)
 - 更新文档说明
 - 添加弹窗翻译
 - 优化浏览器语言检测
-- 优化操作逻辑减少操作步骤 [#69](https://github.com/djylb/nps/issues/69)
+- 优化操作逻辑减少操作步骤 [#69](https://github.com/mcmy/nps2/issues/69)
 
 ### v0.26.53 (2025-04-25)
 - P2P同时转发TCP和UDP端口
@@ -603,23 +603,23 @@
 
 ### v0.26.50 (2025-04-19)
 - 优化P2P探测和连接速度
-- 隧道编辑页面支持保存为新配置 [#8](https://github.com/djylb/nps/issues/8)
+- 隧道编辑页面支持保存为新配置 [#8](https://github.com/mcmy/nps2/issues/8)
 - 调整页面显示，添加排序支持
 
 ### v0.26.49 (2025-04-18)
 - vkey添加点击复制
-- 重写透明代理逻辑 [#59](https://github.com/djylb/nps/issues/59)
+- 重写透明代理逻辑 [#59](https://github.com/mcmy/nps2/issues/59)
 - 修复linux、darwin、freebsd的透明代理
 
 ### v0.26.48 (2025-04-17)
-- 添加点击自动复制命令行 [#62](https://github.com/djylb/nps/issues/62)
+- 添加点击自动复制命令行 [#62](https://github.com/mcmy/nps2/issues/62)
 - 密码认证配置内容忽略空行
 - 修复NPS的IPv6自动识别
 - 修复管理页面显示
 - 隧道列表支持端口号排序
 - 重写客户端TLS功能，支持使用type传入tls （已弃用tls_enable）
 - 重写服务端TLS功能，支持TLS端口复用 （已弃用tls_enable）
-- 客户端支持连接多个服务器 [#9](https://github.com/djylb/nps/issues/9)
+- 客户端支持连接多个服务器 [#9](https://github.com/mcmy/nps2/issues/9)
 - 更新证书随机生成
 
 ### v0.26.47 (2025-04-14)
@@ -638,16 +638,16 @@
 - 新增OpenWRT仓库 [djylb/nps-openwrt](https://github.com/djylb/nps-openwrt)
 - 修复拼写错误
 - 自动更新[Android](https://github.com/djylb/npsclient)和[OpenWrt](https://github.com/djylb/nps-openwrt)仓库
-- 自动识别服务器IP [#59](https://github.com/djylb/nps/issues/59)
+- 自动识别服务器IP [#59](https://github.com/mcmy/nps2/issues/59)
 - P2P支持IPv6（需要纯IPv6网络环境）
 
 ### v0.26.45 (2025-04-09)
 - 搜索功能匹配不限制大小写
-- 修复HTTP代理认证头 [#55](https://github.com/djylb/nps/issues/55)
-- 添加编译架构 [#53](https://github.com/djylb/nps/issues/53)
+- 修复HTTP代理认证头 [#55](https://github.com/mcmy/nps2/issues/55)
+- 添加编译架构 [#53](https://github.com/mcmy/nps2/issues/53)
 - 增加自定义DNS支持非标准系统
-- 新增安卓客户端 [#53](https://github.com/djylb/nps/issues/53) [djylb/npsclient](https://github.com/djylb/npsclient)
-- 美化下拉框样式，使用标准JSON保存数据 [#51](https://github.com/djylb/nps/pull/51) (感谢[yhl452493373](https://github.com/yhl452493373))
+- 新增安卓客户端 [#53](https://github.com/mcmy/nps2/issues/53) [djylb/npsclient](https://github.com/djylb/npsclient)
+- 美化下拉框样式，使用标准JSON保存数据 [#51](https://github.com/mcmy/nps2/pull/51) (感谢[yhl452493373](https://github.com/yhl452493373))
 
 ### v0.26.44 (2025-03-26)
 - 修复客户端超过1000不显示问题
@@ -666,9 +666,9 @@
 
 ### v0.26.41 (2025-03-22)
 - Docker自动创建NPS默认配置 **（一定要记得改配置）**
-- 固定管理页面左侧菜单、顶部标题、底部footer [#49](https://github.com/djylb/nps/pull/49)
+- 固定管理页面左侧菜单、顶部标题、底部footer [#49](https://github.com/mcmy/nps2/pull/49)
 - 优化运行速度，减少资源占用
-- 修复单条隧道流量统计 [#30](https://github.com/djylb/nps/issues/30)
+- 修复单条隧道流量统计 [#30](https://github.com/mcmy/nps2/issues/30)
 - 增强流量统计颗粒度 **（注意：客户端流量是隧道流量出入总和的两倍）**
 - 修复文件模式访问
 - 调整管理页面文件模式显示
@@ -679,12 +679,12 @@
 - 修复NPC客户端NAT检测
 
 ### v0.26.40 (2025-03-21)
-- 前端页面美化 [#47](https://github.com/djylb/nps/pull/47)
+- 前端页面美化 [#47](https://github.com/mcmy/nps2/pull/47)
 - 增加docker支持架构，添加shell支持
-- 向NPS的docker镜像添加tzdata软件包支持时区配置 [#45](https://github.com/djylb/nps/issues/45)
-- 私密代理支持通过TLS连接 [#37](https://github.com/djylb/nps/issues/37)
+- 向NPS的docker镜像添加tzdata软件包支持时区配置 [#45](https://github.com/mcmy/nps2/issues/45)
+- 私密代理支持通过TLS连接 [#37](https://github.com/mcmy/nps2/issues/37)
 - docker添加主线分支发布
-- 修复连接数统计问题 [#48](https://github.com/djylb/nps/issues/48)
+- 修复连接数统计问题 [#48](https://github.com/mcmy/nps2/issues/48)
 
 ### v0.26.39 (2025-03-16)
 - 切换包至本仓库
@@ -702,4 +702,4 @@
 - 整理仓库代码
 - 优化域名查找算法
 
-更多历史更新记录请参阅项目 [Releases](https://github.com/djylb/nps/releases)
+更多历史更新记录请参阅项目 [Releases](https://github.com/mcmy/nps2/releases)

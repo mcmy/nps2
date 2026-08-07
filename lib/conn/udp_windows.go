@@ -6,7 +6,7 @@ package conn
 import (
 	"net"
 
-	"github.com/djylb/nps/lib/common"
+	"github.com/mcmy/nps2/lib/common"
 )
 
 func NewUdpConnByAddr(addr string) (net.PacketConn, error) {

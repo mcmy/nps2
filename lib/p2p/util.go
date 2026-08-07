@@ -12,7 +12,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/djylb/nps/lib/common"
+	"github.com/mcmy/nps2/lib/common"
 )
 
 func getNextAddr(addr string, n int) (string, error) {

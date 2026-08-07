@@ -4,7 +4,7 @@ import (
 	"html/template"
 
 	"github.com/beego/beego"
-	"github.com/djylb/nps/server"
+	"github.com/mcmy/nps2/server"
 )
 
 type IndexController struct {

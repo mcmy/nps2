@@ -1,4 +1,4 @@
-module github.com/djylb/nps
+module github.com/mcmy/nps2
 
 go 1.26
 

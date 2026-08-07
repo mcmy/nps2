@@ -1,4 +1,4 @@
-![logo](https://cdn.jsdelivr.net/gh/djylb/nps/docs/logo.svg)
+![logo](https://cdn.jsdelivr.net/gh/mcmy/nps2/docs/logo.svg)
 
 # NPS <small>0.35.0</small>
 
@@ -12,5 +12,5 @@
 - 扩展功能强大
 - 全平台兼容，一键注册为服务
 
-[GitHub](https://github.com/djylb/nps/)
+[GitHub](https://github.com/mcmy/nps2/)
 [开始使用](#nps)

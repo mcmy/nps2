@@ -1,15 +1,15 @@
 # NPS 内网穿透 (全修)
 
-[![GitHub Stars](https://img.shields.io/github/stars/djylb/nps.svg)](https://github.com/djylb/nps)
-[![GitHub Forks](https://img.shields.io/github/forks/djylb/nps.svg)](https://github.com/djylb/nps)
-[![Release](https://github.com/djylb/nps/workflows/Release/badge.svg)](https://github.com/djylb/nps/actions)
-[![GitHub All Releases](https://img.shields.io/github/downloads/djylb/nps/total)](https://github.com/djylb/nps/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/mcmy/nps2.svg)](https://github.com/mcmy/nps2)
+[![GitHub Forks](https://img.shields.io/github/forks/mcmy/nps2.svg)](https://github.com/mcmy/nps2)
+[![Release](https://github.com/mcmy/nps2/workflows/Release/badge.svg)](https://github.com/mcmy/nps2/actions)
+[![GitHub All Releases](https://img.shields.io/github/downloads/mcmy/nps2/total)](https://github.com/mcmy/nps2/releases)
 
-> 在 [GitHub](https://github.com/djylb/nps) 点击右上角 ⭐ Star 以支持我在空闲时间继续开发
+> 在 [GitHub](https://github.com/mcmy/nps2) 点击右上角 ⭐ Star 以支持我在空闲时间继续开发
 
 > 由于 GitHub 限制浏览器语言为中文（Accept-Language=zh-CN) 访问 *.githubusercontent.com ，图标可能无法正常显示。
 
-- [English](https://github.com/djylb/nps/blob/master/README.md)
+- [English](https://github.com/mcmy/nps2/blob/master/README.md)
 
 ---
 
@@ -17,16 +17,18 @@
 
 NPS 是一款轻量高效的内网穿透代理服务器，支持多种协议（TCP、UDP、HTTP、HTTPS、SOCKS5 等）转发。它提供直观的 Web 管理界面，使得内网资源能安全、便捷地在外网访问，同时满足多种复杂场景的需求。
 
+本仓库基于 [github.com/djylb/nps](https://github.com/djylb/nps) 二次开发，当前项目地址已迁移到 [github.com/mcmy/nps2](https://github.com/mcmy/nps2)。
+
 由于[NPS](https://github.com/ehang-io/nps)停更已久，本仓库整合社区更新二次开发而来。
 
-- **提问前请先查阅：**  [文档](https://d-jy.net/docs/nps/) 与 [Issues](https://github.com/djylb/nps/issues)
+- **提问前请先查阅：**  [文档](https://d-jy.net/docs/nps/) 与 [Issues](https://github.com/mcmy/nps2/issues)
 - **欢迎参与：**  提交 PR、反馈问题或建议，共同推动项目发展。
 - **讨论交流：**  加入 [Telegram 交流群](https://t.me/npsdev) 与其他用户交流经验。
 - **Android：**  [djylb/npsclient](https://github.com/djylb/npsclient)
 - **OpenWrt：**  [djylb/nps-openwrt](https://github.com/djylb/nps-openwrt)
 - **Mirror：**  [djylb/nps-mirror](https://github.com/djylb/nps-mirror)
 
-![NPS Web UI](https://cdn.jsdelivr.net/gh/djylb/nps/image/web.png)
+![NPS Web UI](https://cdn.jsdelivr.net/gh/mcmy/nps2/image/web.png)
 
 ---
 
@@ -59,7 +61,7 @@ NPS 是一款轻量高效的内网穿透代理服务器，支持多种协议（T
 
 ***DockerHub***： [NPS](https://hub.docker.com/r/duan2001/nps) [NPC](https://hub.docker.com/r/duan2001/npc)
 
-***GHCR***： [NPS](https://github.com/djylb/nps/pkgs/container/nps) [NPC](https://github.com/djylb/nps/pkgs/container/npc)
+***GHCR***： [NPS](https://github.com/mcmy/nps2/pkgs/container/nps) [NPC](https://github.com/mcmy/nps2/pkgs/container/npc)
 
 > 有真实IP获取需求可配合 [mmproxy](https://github.com/djylb/mmproxy-docker) 使用。例如：SSH
 
@@ -84,7 +86,7 @@ docker run -d --restart=always --name npc --net=host duan2001/npc -server=xxx:12
 #### Linux
 ```bash
 # 安装（默认配置路径：/etc/nps/；二进制文件路径：/usr/bin/）
-wget -qO- https://fastly.jsdelivr.net/gh/djylb/nps@master/install.sh | sudo sh -s nps
+wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@master/install.sh | sudo sh -s nps
 nps install
 nps start|stop|restart|uninstall
 
@@ -95,7 +97,7 @@ nps update && nps restart
 > **提示：** 首次安装后请先编辑 `/etc/nps/nps.conf`，确认配置无误后再执行 `nps start`。
 
 #### Windows
-> Windows 7 用户请使用 old 结尾版本 [64](https://github.com/djylb/nps/releases/latest/download/windows_amd64_server_old.tar.gz) / [32](https://github.com/djylb/nps/releases/latest/download/windows_386_server_old.tar.gz)
+> Windows 7 用户请使用 old 结尾版本 [64](https://github.com/mcmy/nps2/releases/latest/download/windows_amd64_server_old.tar.gz) / [32](https://github.com/mcmy/nps2/releases/latest/download/windows_386_server_old.tar.gz)
 ```powershell
 .\nps.exe install
 .\nps.exe start|stop|restart|uninstall
@@ -110,7 +112,7 @@ nps update && nps restart
 
 #### Linux
 ```bash
-wget -qO- https://fastly.jsdelivr.net/gh/djylb/nps@master/install.sh | sudo sh -s npc
+wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@master/install.sh | sudo sh -s npc
 /usr/bin/npc install -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls -log=off
 npc start|stop|restart|uninstall
 
@@ -121,7 +123,7 @@ npc update && npc restart
 > **提示：** `npc install` 命令中的参数请以 NPS Web 管理端客户端页面生成的命令为准。
 
 #### Windows
-> Windows 7 用户请使用 old 结尾版本 [64](https://github.com/djylb/nps/releases/latest/download/windows_amd64_client_old.tar.gz) / [32](https://github.com/djylb/nps/releases/latest/download/windows_386_client_old.tar.gz)
+> Windows 7 用户请使用 old 结尾版本 [64](https://github.com/mcmy/nps2/releases/latest/download/windows_amd64_client_old.tar.gz) / [32](https://github.com/mcmy/nps2/releases/latest/download/windows_386_client_old.tar.gz)
 ```powershell
 .\npc.exe install -server="xxx:123,yyy:456" -vkey="xxx,yyy" -type="tls,tcp" -log="off"
 .\npc.exe start|stop|restart|uninstall

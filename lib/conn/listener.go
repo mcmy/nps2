@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/djylb/nps/lib/logs"
+	"github.com/mcmy/nps2/lib/logs"
 	"github.com/quic-go/quic-go"
 	"github.com/xtaci/kcp-go/v5"
 )

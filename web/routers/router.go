@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/beego/beego"
-	"github.com/djylb/nps/web/controllers"
+	"github.com/mcmy/nps2/web/controllers"
 )
 
 func Init() {

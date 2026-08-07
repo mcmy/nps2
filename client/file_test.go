@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/djylb/nps/lib/conn"
-	"github.com/djylb/nps/lib/file"
+	"github.com/mcmy/nps2/lib/conn"
+	"github.com/mcmy/nps2/lib/file"
 )
 
 func TestBasicAuth(t *testing.T) {

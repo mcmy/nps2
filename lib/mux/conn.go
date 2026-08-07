@@ -10,7 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/djylb/nps/lib/logs"
+	"github.com/mcmy/nps2/lib/logs"
 )
 
 type Conn struct {

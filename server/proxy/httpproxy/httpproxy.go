@@ -13,12 +13,12 @@ import (
 
 	"github.com/beego/beego"
 	"github.com/caddyserver/certmagic"
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/file"
-	"github.com/djylb/nps/lib/index"
-	"github.com/djylb/nps/lib/logs"
-	"github.com/djylb/nps/server/connection"
-	"github.com/djylb/nps/server/proxy"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/file"
+	"github.com/mcmy/nps2/lib/index"
+	"github.com/mcmy/nps2/lib/logs"
+	"github.com/mcmy/nps2/server/connection"
+	"github.com/mcmy/nps2/server/proxy"
 )
 
 type HttpProxy struct {

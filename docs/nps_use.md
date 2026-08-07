@@ -89,7 +89,7 @@ nps.exe restart # Restart NPS
    ```
 
 📌 **如果更新失败**
-- **手动下载最新版本**：[🔗 GitHub Releases](https://github.com/djylb/nps/releases/latest)
+- **手动下载最新版本**：[🔗 GitHub Releases](https://github.com/mcmy/nps2/releases/latest)
 - **覆盖原有 `nps` 二进制文件和 `web` 目录**
 - **安装 `nps` 后可执行文件路径可能会改变，使用以下命令查找**
   ```bash
@@ -124,4 +124,4 @@ Start-Service nps  # Start nps
 
 ---
 
-✅ **如需更多帮助，请查看 [文档](https://github.com/djylb/nps) 或提交 [GitHub Issues](https://github.com/djylb/nps/issues) 反馈问题。**
+✅ **如需更多帮助，请查看 [文档](https://github.com/mcmy/nps2) 或提交 [GitHub Issues](https://github.com/mcmy/nps2/issues) 反馈问题。**

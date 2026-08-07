@@ -18,9 +18,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/file"
-	"github.com/djylb/nps/lib/pmux"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/file"
+	"github.com/mcmy/nps2/lib/pmux"
 	"github.com/xtaci/kcp-go/v5"
 )
 

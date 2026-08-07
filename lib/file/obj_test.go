@@ -4,8 +4,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/crypt"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/crypt"
 )
 
 func TestFlowSubDoesNotGoNegative(t *testing.T) {

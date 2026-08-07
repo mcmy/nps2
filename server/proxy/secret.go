@@ -3,10 +3,10 @@ package proxy
 import (
 	"net"
 
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/conn"
-	"github.com/djylb/nps/lib/file"
-	"github.com/djylb/nps/lib/logs"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/conn"
+	"github.com/mcmy/nps2/lib/file"
+	"github.com/mcmy/nps2/lib/logs"
 )
 
 type SecretServer struct {

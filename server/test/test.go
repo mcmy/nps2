@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/beego/beego"
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/file"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/file"
 )
 
 func TestServerConfig() {

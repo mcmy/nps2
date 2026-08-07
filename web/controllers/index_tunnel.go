@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/beego/beego"
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/file"
-	"github.com/djylb/nps/server"
-	"github.com/djylb/nps/server/tool"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/file"
+	"github.com/mcmy/nps2/server"
+	"github.com/mcmy/nps2/server/tool"
 )
 
 func (s *IndexController) GetTunnel() {

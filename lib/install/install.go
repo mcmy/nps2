@@ -20,8 +20,8 @@ import (
 	"time"
 
 	"github.com/c4milo/unpackit"
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/conn"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/conn"
 )
 
 var BuildTarget string
@@ -270,13 +270,13 @@ func downloadLatest(bin string) string {
 		urls = []string{
 			fmt.Sprintf("https://cdn.jsdelivr.net/gh/djylb/nps-mirror@latest/%s", filename),
 			fmt.Sprintf("https://fastly.jsdelivr.net/gh/djylb/nps-mirror@latest/%s", filename),
-			fmt.Sprintf("https://github.com/djylb/nps/releases/latest/download/%s", filename),
+			fmt.Sprintf("https://github.com/mcmy/nps2/releases/latest/download/%s", filename),
 			fmt.Sprintf("https://gcore.jsdelivr.net/gh/djylb/nps-mirror@latest/%s", filename),
 			fmt.Sprintf("https://testingcf.jsdelivr.net/gh/djylb/nps-mirror@latest/%s", filename),
 		}
 	} else {
 		urls = []string{
-			fmt.Sprintf("https://github.com/djylb/nps/releases/download/%s/%s", version, filename),
+			fmt.Sprintf("https://github.com/mcmy/nps2/releases/download/%s/%s", version, filename),
 			fmt.Sprintf("https://cdn.jsdelivr.net/gh/djylb/nps-mirror@%s/%s", version, filename),
 			fmt.Sprintf("https://fastly.jsdelivr.net/gh/djylb/nps-mirror@%s/%s", version, filename),
 			fmt.Sprintf("https://gcore.jsdelivr.net/gh/djylb/nps-mirror@%s/%s", version, filename),

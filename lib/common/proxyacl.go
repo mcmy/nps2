@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/djylb/nps/lib/logs"
+	"github.com/mcmy/nps2/lib/logs"
 )
 
 // ProxyACL is an allow-list matcher for proxy destinations.

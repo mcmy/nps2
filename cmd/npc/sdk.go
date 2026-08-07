@@ -7,10 +7,10 @@ import (
 	"C"
 	"context"
 
-	"github.com/djylb/nps/client"
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/logs"
-	"github.com/djylb/nps/lib/version"
+	"github.com/mcmy/nps2/client"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/logs"
+	"github.com/mcmy/nps2/lib/version"
 )
 
 var cl *client.TRPClient

@@ -86,7 +86,7 @@ build_binary() {
 
   local build_ldflags="$COMMON_LDFLAGS"
   if [[ -n "$arch_tag" ]]; then
-    build_ldflags+=" -X 'github.com/djylb/nps/lib/install.BuildTarget=${arch_tag}'"
+    build_ldflags+=" -X 'github.com/mcmy/nps2/lib/install.BuildTarget=${arch_tag}'"
   fi
 
   if [[ -n "$envstr" ]]; then

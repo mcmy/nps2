@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/djylb/nps/lib/common"
 	"github.com/gorilla/websocket"
+	"github.com/mcmy/nps2/lib/common"
 )
 
 type WsConn struct {

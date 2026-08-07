@@ -1,7 +1,7 @@
 FROM golang:latest AS builder
 # ARG GOPROXY=direct
 ARG GOPROXY=https://proxy.golang.org
-WORKDIR /go/src/github.com/djylb/nps
+WORKDIR /go/src/github.com/mcmy/nps2
 COPY . .
 RUN go mod edit -go=$(go version | awk '{print $3}' | sed 's/go//') && \
     go mod tidy && \
@@ -10,6 +10,6 @@ RUN CGO_ENABLED=0 go build -ldflags="-w -s -extldflags -static" ./cmd/npc/npc.go
 
 FROM alpine
 RUN apk add --no-cache tzdata nano ca-certificates && update-ca-certificates
-COPY --from=builder /go/src/github.com/djylb/nps/npc /
+COPY --from=builder /go/src/github.com/mcmy/nps2/npc /
 VOLUME /conf
 ENTRYPOINT ["/npc"]

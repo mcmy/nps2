@@ -4,7 +4,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
-	"github.com/djylb/nps/lib/logs"
+	"github.com/mcmy/nps2/lib/logs"
 )
 
 func InitPProfByAddr(addr string) {

@@ -1,11 +1,11 @@
 # NPS
 
-[![GitHub stars](https://img.shields.io/github/stars/djylb/nps.svg)](https://github.com/djylb/nps)
-[![GitHub forks](https://img.shields.io/github/forks/djylb/nps.svg)](https://github.com/djylb/nps)
-[![Release](https://github.com/djylb/nps/workflows/Release/badge.svg)](https://github.com/djylb/nps/actions)
-[![GitHub All Releases](https://img.shields.io/github/downloads/djylb/nps/total)](https://github.com/djylb/nps/releases)
+[![GitHub stars](https://img.shields.io/github/stars/mcmy/nps2.svg)](https://github.com/mcmy/nps2)
+[![GitHub forks](https://img.shields.io/github/forks/mcmy/nps2.svg)](https://github.com/mcmy/nps2)
+[![Release](https://github.com/mcmy/nps2/workflows/Release/badge.svg)](https://github.com/mcmy/nps2/actions)
+[![GitHub All Releases](https://img.shields.io/github/downloads/mcmy/nps2/total)](https://github.com/mcmy/nps2/releases)
 
-> 在 [GitHub](https://github.com/djylb/nps) 点击右上角 ⭐ Star 以支持我在空闲时间继续开发
+> 在 [GitHub](https://github.com/mcmy/nps2) 点击右上角 ⭐ Star 以支持我在空闲时间继续开发
 
 ---
 
@@ -22,7 +22,7 @@ NPS 是一款**轻量级**、**高性能**、**功能强大**的**内网穿透�
 
 ## 背景
 
-![image](https://cdn.jsdelivr.net/gh/djylb/nps/image/web.png)
+![image](https://cdn.jsdelivr.net/gh/mcmy/nps2/image/web.png)
 
 ---
 

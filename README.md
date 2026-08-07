@@ -2,14 +2,14 @@
 
 A high-performance NAT traversal and reverse proxy server with Web UI.
 
-[![GitHub Stars](https://img.shields.io/github/stars/djylb/nps.svg)](https://github.com/djylb/nps)
-[![GitHub Forks](https://img.shields.io/github/forks/djylb/nps.svg)](https://github.com/djylb/nps)
-[![Release](https://github.com/djylb/nps/workflows/Release/badge.svg)](https://github.com/djylb/nps/actions)
-[![GitHub All Releases](https://img.shields.io/github/downloads/djylb/nps/total)](https://github.com/djylb/nps/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/mcmy/nps2.svg)](https://github.com/mcmy/nps2)
+[![GitHub Forks](https://img.shields.io/github/forks/mcmy/nps2.svg)](https://github.com/mcmy/nps2)
+[![Release](https://github.com/mcmy/nps2/workflows/Release/badge.svg)](https://github.com/mcmy/nps2/actions)
+[![GitHub All Releases](https://img.shields.io/github/downloads/mcmy/nps2/total)](https://github.com/mcmy/nps2/releases)
 
-> ⭐️ Give us a star on [GitHub](https://github.com/djylb/nps) if you like it!
+> ⭐️ Give us a star on [GitHub](https://github.com/mcmy/nps2) if you like it!
 
-- [中文文档](https://github.com/djylb/nps/blob/master/README_zh.md)
+- [中文文档](https://github.com/mcmy/nps2/blob/master/README_zh.md)
 
 ---
 
@@ -17,16 +17,18 @@ A high-performance NAT traversal and reverse proxy server with Web UI.
 
 NPS is a lightweight and efficient NAT traversal and reverse proxy system for exposing services behind NAT or firewalls. It supports multiple protocols such as TCP, UDP, HTTP, HTTPS, and SOCKS5, and provides a Web management interface for convenient deployment and monitoring.
 
+This repository is a fork based on [github.com/djylb/nps](https://github.com/djylb/nps), with the active project address moved to [github.com/mcmy/nps2](https://github.com/mcmy/nps2).
+
 Since the original [NPS](https://github.com/ehang-io/nps) project has been inactive for a long time, this repository continues its development as an actively maintained community version with extensive refactoring, improved stability, and enhanced functionality.
 
-- **Before asking questions, please check:** [Documentation](https://d-jy.net/docs/nps/) and [Issues](https://github.com/djylb/nps/issues)
+- **Before asking questions, please check:** [Documentation](https://d-jy.net/docs/nps/) and [Issues](https://github.com/mcmy/nps2/issues)
 - **Contributions welcome:** Submit PRs, provide feedback or suggestions, and help drive the project forward
 - **Join the discussion:** Connect with other users in our [Telegram Group](https://t.me/npsdev)
 - **Android:** [djylb/npsclient](https://github.com/djylb/npsclient)
 - **OpenWrt:** [djylb/nps-openwrt](https://github.com/djylb/nps-openwrt)
 - **Mirror:** [djylb/nps-mirror](https://github.com/djylb/nps-mirror)
 
-![NPS Web UI](https://cdn.jsdelivr.net/gh/djylb/nps/image/web.png)
+![NPS Web UI](https://cdn.jsdelivr.net/gh/mcmy/nps2/image/web.png)
 
 ---
 
@@ -59,7 +61,7 @@ For more detailed configuration options, please refer to the [Documentation](htt
 
 **DockerHub:** [NPS](https://hub.docker.com/r/duan2001/nps) | [NPC](https://hub.docker.com/r/duan2001/npc)
 
-**GHCR:** [NPS](https://github.com/djylb/nps/pkgs/container/nps) | [NPC](https://github.com/djylb/nps/pkgs/container/npc)
+**GHCR:** [NPS](https://github.com/mcmy/nps2/pkgs/container/nps) | [NPC](https://github.com/mcmy/nps2/pkgs/container/npc)
 
 > If you need to obtain the real client IP, you can use it together with [mmproxy](https://github.com/djylb/mmproxy-docker). For example: SSH.
 
@@ -87,7 +89,7 @@ docker run -d --restart=always --name npc --net=host duan2001/npc -server=xxx:12
 
 ```bash
 # Install (default configuration path: /etc/nps/; binary file path: /usr/bin/)
-wget -qO- https://raw.githubusercontent.com/djylb/nps/refs/heads/master/install.sh | sudo sh -s nps
+wget -qO- https://raw.githubusercontent.com/mcmy/nps2/refs/heads/master/install.sh | sudo sh -s nps
 nps install
 nps start|stop|restart|uninstall
 
@@ -99,7 +101,7 @@ nps update && nps restart
 
 #### Windows
 
-> Windows 7 users should use the version ending with old: [64](https://github.com/djylb/nps/releases/latest/download/windows_amd64_server_old.tar.gz) / [32](https://github.com/djylb/nps/releases/latest/download/windows_386_server_old.tar.gz)
+> Windows 7 users should use the version ending with old: [64](https://github.com/mcmy/nps2/releases/latest/download/windows_amd64_server_old.tar.gz) / [32](https://github.com/mcmy/nps2/releases/latest/download/windows_386_server_old.tar.gz)
 
 ```powershell
 .\nps.exe install
@@ -116,7 +118,7 @@ nps update && nps restart
 #### Linux
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/djylb/nps/refs/heads/master/install.sh | sudo sh -s npc
+wget -qO- https://raw.githubusercontent.com/mcmy/nps2/refs/heads/master/install.sh | sudo sh -s npc
 /usr/bin/npc install -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls -log=off
 npc start|stop|restart|uninstall
 
@@ -128,7 +130,7 @@ npc update && npc restart
 
 #### Windows
 
-> Windows 7 users should use the version ending with old: [64](https://github.com/djylb/nps/releases/latest/download/windows_amd64_client_old.tar.gz) / [32](https://github.com/djylb/nps/releases/latest/download/windows_386_client_old.tar.gz)
+> Windows 7 users should use the version ending with old: [64](https://github.com/mcmy/nps2/releases/latest/download/windows_amd64_client_old.tar.gz) / [32](https://github.com/mcmy/nps2/releases/latest/download/windows_386_client_old.tar.gz)
 
 ```powershell
 .\npc.exe install -server="xxx:123,yyy:456" -vkey="xxx,yyy" -type="tls,tcp" -log="off"
@@ -145,4 +147,3 @@ npc update && npc restart
 > Here, `xxx:123` uses TCP, and `yyy:456` and `zzz:789` use TLS.
 
 > If you need to connect to older server versions, add `-proto_version=0` to the startup command.
-

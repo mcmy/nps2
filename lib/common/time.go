@@ -7,7 +7,7 @@ import (
 	_ "time/tzdata"
 
 	"github.com/beevik/ntp"
-	"github.com/djylb/nps/lib/logs"
+	"github.com/mcmy/nps2/lib/logs"
 )
 
 var (

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/djylb/nps/lib/file"
-	"github.com/djylb/nps/lib/rate"
+	"github.com/mcmy/nps2/lib/file"
+	"github.com/mcmy/nps2/lib/rate"
 )
 
 func TestRemoveRepeatedElement(t *testing.T) {

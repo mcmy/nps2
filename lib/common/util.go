@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/araddon/dateparse"
-	"github.com/djylb/nps/lib/logs"
+	"github.com/mcmy/nps2/lib/logs"
 )
 
 func Max(values ...int) int {

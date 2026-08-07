@@ -7,10 +7,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/crypt"
-	"github.com/djylb/nps/lib/index"
-	"github.com/djylb/nps/lib/rate"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/crypt"
+	"github.com/mcmy/nps2/lib/index"
+	"github.com/mcmy/nps2/lib/rate"
 )
 
 type DbUtils struct {

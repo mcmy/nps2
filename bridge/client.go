@@ -8,10 +8,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/djylb/nps/lib/conn"
-	"github.com/djylb/nps/lib/logs"
-	"github.com/djylb/nps/lib/mux"
-	"github.com/djylb/nps/lib/pool"
+	"github.com/mcmy/nps2/lib/conn"
+	"github.com/mcmy/nps2/lib/logs"
+	"github.com/mcmy/nps2/lib/mux"
+	"github.com/mcmy/nps2/lib/pool"
 	"github.com/quic-go/quic-go"
 )
 

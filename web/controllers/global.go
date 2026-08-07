@@ -3,7 +3,7 @@ package controllers
 import (
 	"strings"
 
-	"github.com/djylb/nps/lib/file"
+	"github.com/mcmy/nps2/lib/file"
 )
 
 type GlobalController struct {

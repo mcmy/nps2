@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"net"
 
-	"github.com/djylb/nps/lib/common"
+	"github.com/mcmy/nps2/lib/common"
 	"github.com/xtaci/kcp-go/v5"
 )
 

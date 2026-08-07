@@ -211,11 +211,11 @@ download() {
     URLS="
       https://cdn.jsdelivr.net/gh/djylb/nps-mirror@latest/${FILE}
       https://fastly.jsdelivr.net/gh/djylb/nps-mirror@latest/${FILE}
-      https://github.com/djylb/nps/releases/latest/download/${FILE}
+      https://github.com/mcmy/nps2/releases/latest/download/${FILE}
     "
   else
     URLS="
-      https://github.com/djylb/nps/releases/download/${INSTALL_VERSION}/${FILE}
+      https://github.com/mcmy/nps2/releases/download/${INSTALL_VERSION}/${FILE}
       https://cdn.jsdelivr.net/gh/djylb/nps-mirror@${INSTALL_VERSION}/${FILE}
       https://fastly.jsdelivr.net/gh/djylb/nps-mirror@${INSTALL_VERSION}/${FILE}
     "

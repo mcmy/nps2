@@ -5,7 +5,7 @@ import (
 	"net"
 	"sync/atomic"
 
-	"github.com/djylb/nps/lib/conn"
+	"github.com/mcmy/nps2/lib/conn"
 )
 
 type Dialer interface {

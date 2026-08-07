@@ -18,8 +18,8 @@ docker run -d --restart=always --name nps --net=host -v <local_conf_dir>:/conf -
 
 #### **GHCR（可选）**
 ```bash
-docker pull ghcr.io/djylb/nps
-docker run -d --restart=always --name nps --net=host -v <local_conf_dir>:/conf -v /etc/localtime:/etc/localtime:ro ghcr.io/djylb/nps
+docker pull ghcr.io/mcmy/nps
+docker run -d --restart=always --name nps --net=host -v <local_conf_dir>:/conf -v /etc/localtime:/etc/localtime:ro ghcr.io/mcmy/nps
 ```
 
 ---
@@ -34,8 +34,8 @@ docker run -d --restart=always --name npc --net=host duan2001/npc -server=xxx:12
 
 #### **GHCR（可选）**
 ```bash
-docker pull ghcr.io/djylb/npc
-docker run -d --restart=always --name npc --net=host ghcr.io/djylb/npc -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls,tcp -log=off
+docker pull ghcr.io/mcmy/npc
+docker run -d --restart=always --name npc --net=host ghcr.io/mcmy/npc -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls,tcp -log=off
 ```
 
 ---
@@ -47,7 +47,7 @@ docker run -d --restart=always --name npc --net=host ghcr.io/djylb/npc -server=x
 ### 2.1 NPS
 ```bash
 # Install (default configuration path: /etc/nps/; binary file path: /usr/bin/)
-wget -qO- https://fastly.jsdelivr.net/gh/djylb/nps@master/install.sh | sudo sh -s nps
+wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@master/install.sh | sudo sh -s nps
 nps install
 nps start|stop|restart|uninstall
 
@@ -58,7 +58,7 @@ nps update && nps restart
 ### 2.2 NPC
 ```bash
 # Install
-wget -qO- https://fastly.jsdelivr.net/gh/djylb/nps@master/install.sh | sudo sh -s npc
+wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@master/install.sh | sudo sh -s npc
 /usr/bin/npc install -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls -log=off
 npc start|stop|restart|uninstall
 
@@ -88,25 +88,25 @@ npc update && npc restart
 
 NPS 提供官方二进制安装包，适用于 **Windows、Linux、macOS、FreeBSD** 等多种平台。
 
-📌 **下载地址**：[🔗 最新发布页面](https://github.com/djylb/nps/releases/latest)
+📌 **下载地址**：[🔗 最新发布页面](https://github.com/mcmy/nps2/releases/latest)
 
 ---
 
 ### **3.1 Windows 安装**
 
 **Windows 10/11 用户（推荐）**：
-- [64 位（Server）](https://github.com/djylb/nps/releases/latest/download/windows_amd64_server.tar.gz)
-- [64 位（Client）](https://github.com/djylb/nps/releases/latest/download/windows_amd64_client.tar.gz)
-- [32 位（Server）](https://github.com/djylb/nps/releases/latest/download/windows_386_server.tar.gz)
-- [32 位（Client）](https://github.com/djylb/nps/releases/latest/download/windows_386_client.tar.gz)
-- [ARM64（Server）](https://github.com/djylb/nps/releases/latest/download/windows_arm64_server.tar.gz)
-- [ARM64（Client）](https://github.com/djylb/nps/releases/latest/download/windows_arm64_client.tar.gz)
+- [64 位（Server）](https://github.com/mcmy/nps2/releases/latest/download/windows_amd64_server.tar.gz)
+- [64 位（Client）](https://github.com/mcmy/nps2/releases/latest/download/windows_amd64_client.tar.gz)
+- [32 位（Server）](https://github.com/mcmy/nps2/releases/latest/download/windows_386_server.tar.gz)
+- [32 位（Client）](https://github.com/mcmy/nps2/releases/latest/download/windows_386_client.tar.gz)
+- [ARM64（Server）](https://github.com/mcmy/nps2/releases/latest/download/windows_arm64_server.tar.gz)
+- [ARM64（Client）](https://github.com/mcmy/nps2/releases/latest/download/windows_arm64_client.tar.gz)
 
 **Windows 7 用户（使用 `old` 结尾版本）**：
-- [64 位（Server）](https://github.com/djylb/nps/releases/latest/download/windows_amd64_server_old.tar.gz)
-- [64 位（Client）](https://github.com/djylb/nps/releases/latest/download/windows_amd64_client_old.tar.gz)
-- [32 位（Server）](https://github.com/djylb/nps/releases/latest/download/windows_386_server_old.tar.gz)
-- [32 位（Client）](https://github.com/djylb/nps/releases/latest/download/windows_386_client_old.tar.gz)
+- [64 位（Server）](https://github.com/mcmy/nps2/releases/latest/download/windows_amd64_server_old.tar.gz)
+- [64 位（Client）](https://github.com/mcmy/nps2/releases/latest/download/windows_amd64_client_old.tar.gz)
+- [32 位（Server）](https://github.com/mcmy/nps2/releases/latest/download/windows_386_server_old.tar.gz)
+- [32 位（Client）](https://github.com/mcmy/nps2/releases/latest/download/windows_386_client_old.tar.gz)
 
 📌 **安装方式（解压后进入文件夹）**
 ```powershell
@@ -139,20 +139,20 @@ NPS 提供官方二进制安装包，适用于 **Windows、Linux、macOS、FreeB
 📌 **推荐使用 Docker 运行。**
 
 #### **X86/64**
-- [64 位（Server）](https://github.com/djylb/nps/releases/latest/download/linux_amd64_server.tar.gz)
-- [64 位（Client）](https://github.com/djylb/nps/releases/latest/download/linux_amd64_client.tar.gz)
-- [32 位（Server）](https://github.com/djylb/nps/releases/latest/download/linux_386_server.tar.gz)
-- [32 位（Client）](https://github.com/djylb/nps/releases/latest/download/linux_386_client.tar.gz)
+- [64 位（Server）](https://github.com/mcmy/nps2/releases/latest/download/linux_amd64_server.tar.gz)
+- [64 位（Client）](https://github.com/mcmy/nps2/releases/latest/download/linux_amd64_client.tar.gz)
+- [32 位（Server）](https://github.com/mcmy/nps2/releases/latest/download/linux_386_server.tar.gz)
+- [32 位（Client）](https://github.com/mcmy/nps2/releases/latest/download/linux_386_client.tar.gz)
 
 #### **ARM**
-- [ARM64（Server）](https://github.com/djylb/nps/releases/latest/download/linux_arm64_server.tar.gz)
-- [ARM64（Client）](https://github.com/djylb/nps/releases/latest/download/linux_arm64_client.tar.gz)
-- [ARMv5（Server）](https://github.com/djylb/nps/releases/latest/download/linux_arm_v5_server.tar.gz)
-- [ARMv5（Client）](https://github.com/djylb/nps/releases/latest/download/linux_arm_v5_client.tar.gz)
-- [ARMv6（Server）](https://github.com/djylb/nps/releases/latest/download/linux_arm_v6_server.tar.gz)
-- [ARMv6（Client）](https://github.com/djylb/nps/releases/latest/download/linux_arm_v6_client.tar.gz)
-- [ARMv7（Server）](https://github.com/djylb/nps/releases/latest/download/linux_arm_v7_server.tar.gz)
-- [ARMv7（Client）](https://github.com/djylb/nps/releases/latest/download/linux_arm_v7_client.tar.gz)
+- [ARM64（Server）](https://github.com/mcmy/nps2/releases/latest/download/linux_arm64_server.tar.gz)
+- [ARM64（Client）](https://github.com/mcmy/nps2/releases/latest/download/linux_arm64_client.tar.gz)
+- [ARMv5（Server）](https://github.com/mcmy/nps2/releases/latest/download/linux_arm_v5_server.tar.gz)
+- [ARMv5（Client）](https://github.com/mcmy/nps2/releases/latest/download/linux_arm_v5_client.tar.gz)
+- [ARMv6（Server）](https://github.com/mcmy/nps2/releases/latest/download/linux_arm_v6_server.tar.gz)
+- [ARMv6（Client）](https://github.com/mcmy/nps2/releases/latest/download/linux_arm_v6_client.tar.gz)
+- [ARMv7（Server）](https://github.com/mcmy/nps2/releases/latest/download/linux_arm_v7_server.tar.gz)
+- [ARMv7（Client）](https://github.com/mcmy/nps2/releases/latest/download/linux_arm_v7_client.tar.gz)
 
 📌 **安装方式（解压后进入文件夹）**
 ```bash
@@ -179,10 +179,10 @@ npc update && npc restart
 ---
 
 ### **3.3 macOS 安装**
-- [Intel（Server）](https://github.com/djylb/nps/releases/latest/download/darwin_amd64_server.tar.gz)
-- [Intel（Client）](https://github.com/djylb/nps/releases/latest/download/darwin_amd64_client.tar.gz)
-- [Apple Silicon（Server）](https://github.com/djylb/nps/releases/latest/download/darwin_arm64_server.tar.gz)
-- [Apple Silicon（Client）](https://github.com/djylb/nps/releases/latest/download/darwin_arm64_client.tar.gz)
+- [Intel（Server）](https://github.com/mcmy/nps2/releases/latest/download/darwin_amd64_server.tar.gz)
+- [Intel（Client）](https://github.com/mcmy/nps2/releases/latest/download/darwin_amd64_client.tar.gz)
+- [Apple Silicon（Server）](https://github.com/mcmy/nps2/releases/latest/download/darwin_arm64_server.tar.gz)
+- [Apple Silicon（Client）](https://github.com/mcmy/nps2/releases/latest/download/darwin_arm64_client.tar.gz)
 
 📌 **安装方式（解压后进入文件夹）**
 ```bash
@@ -209,12 +209,12 @@ npc update && npc restart
 ---
 
 ### **3.4 FreeBSD 安装**
-- [AMD64（Server）](https://github.com/djylb/nps/releases/latest/download/freebsd_amd64_server.tar.gz)
-- [AMD64（Client）](https://github.com/djylb/nps/releases/latest/download/freebsd_amd64_client.tar.gz)
-- [386（Server）](https://github.com/djylb/nps/releases/latest/download/freebsd_386_server.tar.gz)
-- [386（Client）](https://github.com/djylb/nps/releases/latest/download/freebsd_386_client.tar.gz)
-- [ARM（Server）](https://github.com/djylb/nps/releases/latest/download/freebsd_arm_server.tar.gz)
-- [ARM（Client）](https://github.com/djylb/nps/releases/latest/download/freebsd_arm_client.tar.gz)
+- [AMD64（Server）](https://github.com/mcmy/nps2/releases/latest/download/freebsd_amd64_server.tar.gz)
+- [AMD64（Client）](https://github.com/mcmy/nps2/releases/latest/download/freebsd_amd64_client.tar.gz)
+- [386（Server）](https://github.com/mcmy/nps2/releases/latest/download/freebsd_386_server.tar.gz)
+- [386（Client）](https://github.com/mcmy/nps2/releases/latest/download/freebsd_386_client.tar.gz)
+- [ARM（Server）](https://github.com/mcmy/nps2/releases/latest/download/freebsd_arm_server.tar.gz)
+- [ARM（Client）](https://github.com/mcmy/nps2/releases/latest/download/freebsd_arm_client.tar.gz)
 
 ---
 
@@ -230,8 +230,8 @@ npc update && npc restart
 
 
 ### **4.2 Termux 运行**
-- [ARM64（Server）](https://github.com/djylb/nps/releases/latest/download/android_arm64_server.tar.gz)
-- [ARM64（Client）](https://github.com/djylb/nps/releases/latest/download/android_arm64_client.tar.gz)。
+- [ARM64（Server）](https://github.com/mcmy/nps2/releases/latest/download/android_arm64_server.tar.gz)
+- [ARM64（Client）](https://github.com/mcmy/nps2/releases/latest/download/android_arm64_client.tar.gz)。
 
 ---
 
@@ -245,7 +245,7 @@ npc update && npc restart
 
 ### **6.1 安装依赖**
 ```bash
-go get -u github.com/djylb/nps
+go get -u github.com/mcmy/nps2
 ```
 
 ### **6.2 编译**
@@ -265,12 +265,12 @@ go build -o npc cmd/npc/npc.go
 
 ## 7. 相关链接
 
-- **最新发布版本**：[GitHub Releases](https://github.com/djylb/nps/releases/latest)
+- **最新发布版本**：[GitHub Releases](https://github.com/mcmy/nps2/releases/latest)
 - **Android**：[djylb/npsclient](https://github.com/djylb/npsclient)
 - **OpenWrt**：[djylb/nps-openwrt](https://github.com/djylb/nps-openwrt)
 - **DockerHub 镜像**
   - [NPS Server](https://hub.docker.com/r/duan2001/nps)
   - [NPC Client](https://hub.docker.com/r/duan2001/npc)
 - **GHCR 镜像**
-  - [NPS Server](https://github.com/djylb/nps/pkgs/container/nps)
-  - [NPC Client](https://github.com/djylb/nps/pkgs/container/npc)
+  - [NPS Server](https://github.com/mcmy/nps2/pkgs/container/nps)
+  - [NPC Client](https://github.com/mcmy/nps2/pkgs/container/npc)

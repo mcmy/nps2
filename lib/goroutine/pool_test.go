@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/djylb/nps/lib/file"
+	"github.com/mcmy/nps2/lib/file"
 )
 
 func TestCopyBuffer_HTTPDetectionAndCopy(t *testing.T) {

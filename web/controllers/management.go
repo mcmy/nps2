@@ -8,10 +8,10 @@ import (
 	"strings"
 
 	"github.com/beego/beego"
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/crypt"
-	"github.com/djylb/nps/lib/file"
-	"github.com/djylb/nps/server"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/crypt"
+	"github.com/mcmy/nps2/lib/file"
+	"github.com/mcmy/nps2/server"
 )
 
 // ManagementController serves the migrated UI shell. Data and mutations stay

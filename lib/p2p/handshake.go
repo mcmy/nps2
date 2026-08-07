@@ -7,8 +7,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/djylb/nps/lib/common"
-	"github.com/djylb/nps/lib/logs"
+	"github.com/mcmy/nps2/lib/common"
+	"github.com/mcmy/nps2/lib/logs"
 )
 
 func waitP2PHandshakeSeed(parentCtx context.Context, localConn net.PacketConn, sendRole string, readTimeout int, seed net.Addr) (remoteAddr, localAddr, role string, err error) {
