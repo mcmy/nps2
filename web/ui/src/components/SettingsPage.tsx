@@ -2,32 +2,24 @@ import { RefreshCw, Save, Search, ShieldCheck, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { actionRequest, request } from '../lib/api';
 import { useI18n } from '../lib/i18n';
-import type { ActionEntry, AnyRecord, Discovery, ResourceList } from '../lib/types';
+import type { ActionEntry, AnyRecord } from '../lib/types';
 import { ConfirmDialog } from './Overlay';
 
-export function GlobalSettings({ discovery, actions, notify }: { discovery: Discovery; actions: Map<string, ActionEntry>; notify: (message: string, type?: 'success' | 'error') => void }) {
+export function GlobalSettings({ actions, notify }: { actions: Map<string, ActionEntry>; notify: (message: string, type?: 'success' | 'error') => void }) {
   const { t } = useI18n();
-  const [item, setItem] = useState<AnyRecord>({ entry_acl_mode: 0, entry_acl_rules: '' });
-  const [node, setNode] = useState<AnyRecord>({});
+  const [item, setItem] = useState<AnyRecord>({ entry_acl_rules: '' });
   const [busy, setBusy] = useState(false);
   const load = useCallback(async () => { const spec = actions.get('settings_global:read'); if (!spec) return; try { const data: any = await request(spec.path); setItem(data.item || data); } catch (error) { notify((error as Error).message, 'error'); } }, [actions, notify]);
-  const loadNode = useCallback(async () => { const spec = actions.get('system:status') || actions.get('system:registration'); if (!spec) return; try { setNode(await request(spec.path)); } catch (error) { notify((error as Error).message, 'error'); } }, [actions, notify]);
-  useEffect(() => { void load(); void loadNode(); }, [load, loadNode]);
-  const cluster = discovery.extensions?.cluster || {};
-  const platforms = node.management_platforms || cluster.management_platforms || [];
-  const capabilities = node.capabilities || cluster.capabilities || [];
-  return <div className="page-enter"><header className="page-header"><div><h1>{t('全局设置')}</h1><p>{t('控制所有入口连接的默认访问规则')}</p></div><div className="page-actions"><button className="icon-btn" onClick={() => { void load(); void loadNode(); }} title={t('刷新')} aria-label={t('刷新')}><RefreshCw /></button><button className="btn primary" disabled={busy || !actions.has('settings_global:update')} onClick={async () => { setBusy(true); try { await actionRequest(actions, 'settings_global', 'update', {}, item); notify(t('全局设置已保存')); } catch (error) { notify((error as Error).message, 'error'); } finally { setBusy(false); } }}><Save />{t(busy ? '保存中…' : '保存')}</button></div></header>
-    <section className="panel"><header className="panel-head"><ShieldCheck size={16} />&nbsp;&nbsp;{t('入口 ACL')}</header><div style={{ padding: 20 }} className="form-grid"><div className="field"><label htmlFor="global-acl-mode">{t('访问模式')}</label><select id="global-acl-mode" value={item.entry_acl_mode || 0} onChange={event => setItem({ ...item, entry_acl_mode: Number(event.target.value) })}><option value="0">{t('禁用')}</option><option value="1">{t('白名单')}</option><option value="2">{t('黑名单')}</option></select></div><div className="field full"><label htmlFor="global-acl-rules">{t('规则')}</label><textarea id="global-acl-rules" rows={12} value={item.entry_acl_rules || ''} onChange={event => setItem({ ...item, entry_acl_rules: event.target.value })} placeholder={t('每行一条 IP 或 CIDR')} /><small>{t('规则变更在保存后立即应用到新连接。')}</small></div></div></section>
-    <section className="panel section-gap"><header className="panel-head">{t('管理平台')}</header><div className="table-wrap embedded-table"><table><thead><tr><th>{t('平台 ID')}</th><th>{t('管理地址')}</th><th>{t('控制范围')}</th><th>{t('连接模式')}</th><th>{t('反向连接')}</th><th>{t('回调')}</th><th>{t('队列')}</th></tr></thead><tbody>{platforms.map((platform: AnyRecord) => <tr key={platform.platform_id}><td className="mono">{platform.platform_id}</td><td className="mono">{platform.master_url || '-'}</td><td>{platform.control_scope || '-'}</td><td><span className="badge">{platform.connect_mode || '-'}</span></td><td><span className={`badge ${platform.reverse_connected ? 'ok' : platform.reverse_enabled ? 'warn' : 'off'}`}>{t(platform.reverse_connected ? '已连接' : platform.reverse_enabled ? '未连接' : '未配置')}</span></td><td><span className={`badge ${platform.callback_enabled ? 'ok' : 'off'}`}>{t(platform.callback_enabled ? '已配置' : '未配置')}</span></td><td className="mono">{platform.callback_queue_size || 0} / {platform.callback_queue_max || 0}</td></tr>)}</tbody></table>{platforms.length === 0 && <div className="empty"><ShieldCheck /><div>{t('未配置管理平台')}</div></div>}</div>
-      <div className="node-meta"><div><span>{t('节点 API')}</span><strong className="mono">{node.api_base || cluster.api_base || discovery.routes.api_base || '-'}</strong></div><div><span>{t('能力')}</span><div className="capability-list">{capabilities.map((value: string) => <code key={value}>{value}</code>)}{capabilities.length === 0 && <small>-</small>}</div></div></div>
-    </section>
+  useEffect(() => { void load(); }, [load]);
+  return <div className="page-enter"><header className="page-header"><div><h1>{t('全局设置')}</h1><p>{t('维护服务端全局 IP 黑名单')}</p></div><div className="page-actions"><button className="icon-btn" onClick={() => void load()} title={t('刷新')} aria-label={t('刷新')}><RefreshCw /></button><button className="btn primary" disabled={busy || !actions.has('settings_global:update')} onClick={async () => { setBusy(true); try { await actionRequest(actions, 'settings_global', 'update', {}, item); notify(t('全局设置已保存')); } catch (error) { notify((error as Error).message, 'error'); } finally { setBusy(false); } }}><Save />{t(busy ? '保存中…' : '保存')}</button></div></header>
+    <section className="panel"><header className="panel-head"><ShieldCheck size={16} />&nbsp;&nbsp;{t('全局 IP 黑名单')}</header><div style={{ padding: 20 }} className="form-grid"><div className="field full"><label htmlFor="global-acl-rules">{t('黑名单规则')}</label><textarea id="global-acl-rules" rows={12} value={item.entry_acl_rules || ''} onChange={event => setItem({ ...item, entry_acl_rules: event.target.value })} placeholder={t('每行一条 IP 或 CIDR')} /><small>{t('规则变更在保存后立即应用到新连接。')}</small></div></div></section>
   </div>;
 }
 
 export function BanList({ actions, notify }: { actions: Map<string, ActionEntry>; notify: (message: string, type?: 'success' | 'error') => void }) {
   const { language, t } = useI18n();
   const [items, setItems] = useState<AnyRecord[]>([]); const [search, setSearch] = useState(''); const [confirm, setConfirm] = useState<{ action: string; key?: string } | null>(null); const [busy, setBusy] = useState(false);
-  const load = useCallback(async () => { const spec = actions.get('security_bans:list'); if (!spec) return; try { const data = await request<ResourceList | AnyRecord[]>(spec.path); setItems(Array.isArray(data) ? data : data.items || []); } catch (error) { notify((error as Error).message, 'error'); } }, [actions, notify]);
+  const load = useCallback(async () => { const spec = actions.get('security_bans:list'); if (!spec) return; try { const data: any = await request(spec.path); const rows = Array.isArray(data) ? data : data.items || data.rows || []; setItems(rows.map((item: AnyRecord) => ({ ...item, key: item.key ?? item.Key, ban_type: item.ban_type ?? item.BanType, fail_times: item.fail_times ?? item.FailTimes, is_banned: item.is_banned ?? item.IsBanned, last_login_time: item.last_login_time ?? item.LastLoginTime }))); } catch (error) { notify((error as Error).message, 'error'); } }, [actions, notify]);
   useEffect(() => { void load(); }, [load]);
   const filtered = items.filter(item => String(item.key || '').toLowerCase().includes(search.toLowerCase()));
   async function mutate() { if (!confirm) return; setBusy(true); try { await actionRequest(actions, 'security_bans', confirm.action, {}, confirm.key ? { key: confirm.key } : {}); notify(t('封禁列表已更新')); setConfirm(null); await load(); } catch (error) { notify((error as Error).message, 'error'); } finally { setBusy(false); } }
@@ -36,20 +28,3 @@ export function BanList({ actions, notify }: { actions: Map<string, ActionEntry>
     {confirm && <ConfirmDialog title={t(confirm.action === 'delete_all' ? '解除全部封禁' : confirm.action === 'clean' ? '清理过期记录' : '解除封禁')} message={confirm.key ? language === 'en' ? `Remove the access restriction for “${confirm.key}”?` : `确认解除“${confirm.key}”的访问限制？` : t('该操作会立即更新登录限制状态。')} danger={confirm.action !== 'clean'} busy={busy} onCancel={() => setConfirm(null)} onConfirm={() => void mutate()} />}
   </div>;
 }
-
-export function CallbackQueue({ actions, notify }: { actions: Map<string, ActionEntry>; notify: (message: string, type?: 'success' | 'error') => void }) {
-  const { t } = useI18n();
-  const [data, setData] = useState<AnyRecord>({ platforms: [] }); const [platform, setPlatform] = useState(''); const [confirm, setConfirm] = useState<string | null>(null); const [busy, setBusy] = useState(false);
-  const listSpec = actions.get('callbacks_queue:list');
-  const load = useCallback(async (selected = platform) => { if (!listSpec) return; try { const url = `${listSpec.path}?limit=100${selected ? `&platform_id=${encodeURIComponent(selected)}` : ''}`; const result: any = await request(url); setData(result); if (!selected && result.platforms?.[0]) setPlatform(result.platforms[0].platform_id); } catch (error) { notify((error as Error).message, 'error'); } }, [listSpec, notify, platform]);
-  useEffect(() => { void load(); }, [listSpec]);
-  useEffect(() => { if (platform) void load(platform); }, [platform]);
-  const current = data.platforms?.find((item: AnyRecord) => item.platform_id === platform) || data.platforms?.[0];
-  async function mutate() { if (!confirm || !platform) return; setBusy(true); try { await actionRequest(actions, 'callbacks_queue', confirm, {}, { platform_id: platform }); notify(t(confirm === 'replay' ? '已触发重放' : '队列已清空')); setConfirm(null); await load(platform); } catch (error) { notify((error as Error).message, 'error'); } finally { setBusy(false); } }
-  return <div className="page-enter"><header className="page-header"><div><h1>{t('回调队列')}</h1><p>{t('检查管理平台回调积压并执行重放')}</p></div><div className="page-actions"><button className="icon-btn" onClick={() => void load(platform)} title={t('刷新')} aria-label={t('刷新')}><RefreshCw /></button>{actions.has('callbacks_queue:replay') && <button className="btn" disabled={!platform} onClick={() => setConfirm('replay')}>{t('重放')}</button>}{actions.has('callbacks_queue:clear') && <button className="btn danger" disabled={!platform} onClick={() => setConfirm('clear')}>{t('清空')}</button>}</div></header>
-    <div className="toolbar"><select style={{ maxWidth: 340 }} value={platform} onChange={event => setPlatform(event.target.value)}>{data.platforms?.map((item: AnyRecord) => <option value={item.platform_id} key={item.platform_id}>{item.platform_id}</option>)}</select><span className="toolbar-count">{current ? `${current.callback_queue_size || 0} / ${current.callback_queue_max || 0}` : t('无可用平台')}</span></div>
-    <div className="table-wrap"><table><thead><tr><th>ID</th><th>{t('事件')}</th><th>{t('资源')}</th><th>{t('操作')}</th><th>{t('序列')}</th><th>{t('请求 ID')}</th><th>{t('入队时间')}</th><th>{t('尝试')}</th></tr></thead><tbody>{current?.items?.map((item: AnyRecord) => <tr key={item.id}><td className="mono">{item.id}</td><td>{item.event_name}</td><td>{item.event_resource}</td><td>{item.event_action}</td><td className="mono">{item.event_sequence}</td><td className="mono">{item.request_id || '-'}</td><td>{formatTime(item.enqueued_at)}</td><td>{item.attempts || 0}</td></tr>)}</tbody></table>{!current?.items?.length && <div className="empty"><RefreshCw /><div>{t('队列为空')}</div></div>}</div>
-    {confirm && <ConfirmDialog title={t(confirm === 'replay' ? '重放回调队列' : '清空回调队列')} message={t(confirm === 'replay' ? '将通知回调发送器重新处理当前积压项目。' : '当前平台的队列项目将被移除，操作无法撤销。')} danger={confirm === 'clear'} busy={busy} onCancel={() => setConfirm(null)} onConfirm={() => void mutate()} />}
-  </div>;
-}
-function formatTime(value: number) { return value ? new Date(value * 1000).toLocaleString() : '-'; }

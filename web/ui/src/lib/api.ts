@@ -155,8 +155,8 @@ export async function actionRequest(
     method: spec.method,
     body: form,
   });
-  if (result && typeof result === 'object' && Number((result as AnyRecord).status) === 0) {
-    throw new Error(String((result as AnyRecord).msg || '操作失败'));
+  if (result && typeof result === 'object' && (Number((result as AnyRecord).status) === 0 || Number((result as AnyRecord).code) === 0)) {
+    throw new Error(String((result as AnyRecord).msg || (result as AnyRecord).message || '操作失败'));
   }
   return result;
 }
@@ -180,7 +180,19 @@ function legacyForm(resource: string, body: AnyRecord) {
   for (const [key, value] of Object.entries(body)) {
     if (value === undefined || value === null) continue;
     const name = aliases[resource]?.[key] || key;
-    form.set(name, Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value));
+    let serialized: string;
+    if (resource === 'clients' && key === 'config_username') serialized = String(value);
+    else if (resource === 'clients' && key === 'config_password') serialized = String(value);
+    else if ((key === 'flow_limit_total_bytes') && Number(value) > 0) serialized = String(Math.ceil(Number(value) / (1024 * 1024)));
+    else if ((key === 'rate_limit_total_bps') && Number(value) > 0) serialized = String(Math.ceil(Number(value) / 8 / 1024));
+    else serialized = Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value);
+    const legacyName = resource === 'clients' && key === 'config_username' ? 'u'
+      : resource === 'clients' && key === 'config_password' ? 'p'
+      : resource === 'clients' && key === 'blackiplist' ? 'blackiplist'
+      : resource === 'clients' && key === 'expire_at' ? 'time_limit'
+      : resource !== 'clients' && key === 'expire_at' ? 'time_limit'
+      : name;
+    form.set(legacyName, serialized);
   }
   return form;
 }

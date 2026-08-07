@@ -18,6 +18,7 @@ func Init() {
 		ns := beego.NewNamespace(webBaseUrl,
 			beego.NSRouter("/", &controllers.ManagementController{}, "get:Index"),
 			beego.NSRouter("/management/meta", &controllers.ManagementController{}, "get:Meta"),
+			beego.NSRouter("/management/global", &controllers.ManagementController{}, "*:Global"),
 			beego.NSAutoRouter(&controllers.IndexController{}),
 			beego.NSAutoRouter(&controllers.LoginController{}),
 			beego.NSAutoRouter(&controllers.ClientController{}),
@@ -28,6 +29,7 @@ func Init() {
 	} else {
 		beego.Router("/", &controllers.ManagementController{}, "get:Index")
 		beego.Router("/management/meta", &controllers.ManagementController{}, "get:Meta")
+		beego.Router("/management/global", &controllers.ManagementController{}, "*:Global")
 		beego.AutoRouter(&controllers.IndexController{})
 		beego.AutoRouter(&controllers.LoginController{})
 		beego.AutoRouter(&controllers.ClientController{})

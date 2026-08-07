@@ -46,9 +46,5 @@ export type PageKey =
   | 'clients'
   | 'tunnels'
   | 'hosts'
-  | 'users'
   | 'settings'
-  | 'bans'
-  | 'callbacks'
-  | 'webhooks'
-  | 'operations';
+  | 'bans';

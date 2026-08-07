@@ -20,7 +20,10 @@ func GetTunnel(start, length int, typeVal string, clientId int, search string, s
 	for _, key := range keys {
 		if value, ok := file.GetDb().JsonDb.Tasks.Load(key); ok {
 			v := value.(*file.Tunnel)
-			if (typeVal != "" && v.Mode != typeVal || (clientId != 0 && v.Client.Id != clientId)) || (typeVal == "" && clientId != v.Client.Id) {
+			// A zero client id means "all visible clients" for administrators.
+			// The migrated UI omits client_id for that view, so do not compare it
+			// against every tunnel's non-zero owner id.
+			if (typeVal != "" && v.Mode != typeVal) || (clientId != 0 && v.Client.Id != clientId) {
 				continue
 			}
 			allList = append(allList, v)

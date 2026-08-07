@@ -1,7 +1,7 @@
 import { Activity, ArrowDown, ArrowUp, Ban, Copy, Edit3, Eye, Filter, Globe2 as GlobeIcon, MoreHorizontal, Network as NetworkIcon, Play, Plus, QrCode, RadioTower, RefreshCw, RotateCcw, Search, Square, Trash2, Unplug, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { actionRequest, materialize, normalizeLegacyKeys, request, requestBlob } from '../lib/api';
-import { formBody, valueFor, type FieldSpec, type ResourceSpec, type SelectOption } from '../lib/forms';
+import { formBody, tunnelModeDetails, tunnelModeOptions, valueFor, type FieldSpec, type ResourceSpec, type SelectOption } from '../lib/forms';
 import { useI18n } from '../lib/i18n';
 import type { ActionEntry, AnyRecord, Discovery, ResourceList } from '../lib/types';
 import { ConfirmDialog, Drawer } from './Overlay';
@@ -15,8 +15,7 @@ interface Props {
 
 const mutationNames: Record<string, Record<string, string>> = {
   clients: { create: '新建客户端', update: '编辑客户端' }, tunnels: { create: '新建隧道', update: '编辑隧道' },
-  hosts: { create: '新建域名代理', update: '编辑域名代理' }, users: { create: '新建用户', update: '编辑用户' },
-  webhooks: { create: '新建 Webhook', update: '编辑 Webhook' },
+  hosts: { create: '新建域名代理', update: '编辑域名代理' },
 };
 
 export default function ResourcePage({ discovery, actions, spec, notify }: Props) {
@@ -111,7 +110,7 @@ export default function ResourcePage({ discovery, actions, spec, notify }: Props
           let body: AnyRecord = {};
           if (apiAction === 'status') {
             const enabled = action === 'start' ? true : action === 'stop' ? false : !isEnabled(item, spec.resource);
-            body = spec.resource === 'webhooks' ? { enabled } : { status: enabled };
+            body = { status: enabled };
           }
           if (apiAction === 'clear') body = { mode: 'flow' };
           if (apiAction === 'kick') body = { client_id: Number(item.id), verify_key: item.verify_key || '' };
@@ -162,7 +161,7 @@ export default function ResourcePage({ discovery, actions, spec, notify }: Props
     </div></header>
     <div className="toolbar"><div className="search"><Search /><input value={search} onChange={event => { setSearch(event.target.value); setPage(1); }} placeholder={language === 'en' ? `Search ${t(spec.title).toLowerCase()}` : `搜索${spec.title}`} aria-label={language === 'en' ? `Search ${t(spec.title).toLowerCase()}` : `搜索${spec.title}`} /></div>
       {(spec.resource === 'tunnels' || spec.resource === 'hosts') && <label className="toolbar-filter"><Filter size={14} /><input value={clientFilter} onChange={event => { setClientFilter(event.target.value); setPage(1); }} placeholder={t('客户端 ID')} aria-label={t('客户端 ID')} inputMode="numeric" /></label>}
-      {spec.resource === 'tunnels' && <select className="toolbar-select" value={modeFilter} onChange={event => { setModeFilter(event.target.value); setPage(1); }} aria-label={t('模式筛选')}><option value="">{t('全部模式')}</option>{['tcp', 'udp', 'mixProxy', 'secret', 'p2p', 'file'].map(mode => <option key={mode} value={mode}>{mode}</option>)}</select>}
+      {spec.resource === 'tunnels' && <select className="toolbar-select" value={modeFilter} onChange={event => { setModeFilter(event.target.value); setPage(1); }} aria-label={t('模式筛选')}><option value="">{t('全部模式')}</option>{tunnelModeOptions.map(option => <option key={option.value} value={option.value}>{t(option.label)}</option>)}</select>}
       <span className="toolbar-count">{loading ? t('载入中') : `${total} ${t('项')}`}</span></div>
     {canBatch && selectedItems.length > 0 && <div className="bulk-bar"><strong>{selectedItems.length} {t('项已选择')}</strong><div className="bulk-actions">
       {(has('status') || has('start') && has('stop')) && <><button className="btn" onClick={() => askBatch('start')}><Play />{t('启动')}</button><button className="btn" onClick={() => askBatch('stop')}><Square />{t('停止')}</button></>}
@@ -239,7 +238,7 @@ function ResourceEditor({ discovery, actions, spec, item, creating = false, busy
   return <Drawer title={t(mutationNames[spec.resource][editing ? 'update' : 'create'])} subtitle={subtitle} onClose={onClose} footer={<><button className="btn" onClick={onClose}>{t('取消')}</button><button className="btn primary" disabled={busy} onClick={() => { const form = formRef.current; if (!form?.reportValidity()) return; try { onSave(formBody(form, spec, editing ? item : null), editing ? item : null); } catch (error) { notify((error as Error).message, 'error'); } }}>{t(busy ? '保存中…' : '保存')}</button></>}>
     <div className="tabs">{spec.tabs.map(current => <button type="button" className={`tab ${tab === current.key ? 'active' : ''}`} key={current.key} onClick={() => setTab(current.key)}>{t(current.label)}</button>)}</div>
     {tab === 'tls' && certSuggestion?.source_host_id && <div className="suggestion-bar"><div><strong>{t('发现可复用证书')}</strong><span>{certSuggestion.source_host}</span></div>{certSuggestion.can_apply_to_form && <button type="button" className="btn" onClick={() => { const form = formRef.current; const cert = form?.elements.namedItem('cert_file') as HTMLTextAreaElement | null; const key = form?.elements.namedItem('key_file') as HTMLTextAreaElement | null; if (cert) cert.value = certSuggestion.cert_file || ''; if (key) key.value = certSuggestion.key_file || ''; notify(t('证书已填入表单')); }}><Copy />{t('应用')}</button>}</div>}
-    <form ref={formRef} className="resource-form" onSubmit={event => event.preventDefault()} onChange={event => { const target = event.target as HTMLInputElement | HTMLSelectElement; if (target.name === 'mode') setMode(target.value); if (target.name === 'host') setHostName(target.value); }}>{spec.tabs.map(current => <div className="tab-panel form-grid" key={current.key} hidden={tab !== current.key}>{spec.fields.filter(field => (field.tab || 'basic') === current.key && (!field.feature || discovery.features[field.feature] !== false) && (!field.editOnly || !!item) && (!field.modes || field.modes.includes(mode))).map(field => <Field key={`${field.name}-${field.name === 'client_id' ? clientOptions.length : 0}`} field={field} value={field.name === 'verify_key' && createVerifyKey ? createVerifyKey : valueFor(item, field)} options={field.name === 'client_id' ? clientOptions : undefined} />)}</div>)}</form>
+    <form ref={formRef} className="resource-form" onSubmit={event => event.preventDefault()} onChange={event => { const target = event.target as HTMLInputElement | HTMLSelectElement; if (target.name === 'mode') setMode(target.value); if (target.name === 'host') setHostName(target.value); }}>{spec.tabs.map(current => <div className="tab-panel form-grid" key={current.key} hidden={tab !== current.key}>{spec.fields.filter(field => (field.tab || 'basic') === current.key && (!field.feature || discovery.features[field.feature] !== false) && (!field.editOnly || !!item) && (!field.modes || field.modes.includes(mode))).map(field => <Field key={`${field.name}-${field.name === 'client_id' ? clientOptions.length : 0}`} field={field} value={field.name === 'mode' ? mode : field.name === 'verify_key' && createVerifyKey ? createVerifyKey : valueFor(item, field)} options={field.name === 'client_id' ? clientOptions : undefined} />)}</div>)}</form>
   </Drawer>;
 }
 
@@ -345,7 +344,6 @@ function DetailValue({ label, value, present = true, t, notify }: { label: strin
 }
 
 function fieldReturned(item: AnyRecord, field: FieldSpec) {
-  if (field.name === 'username' && item.config) return Object.prototype.hasOwnProperty.call(item.config, 'user');
   return Object.prototype.hasOwnProperty.call(item, field.name) && item[field.name] !== undefined && item[field.name] !== null;
 }
 
@@ -431,6 +429,13 @@ function Field({ field, value, options }: { field: FieldSpec; value: any; option
   const { t } = useI18n();
   if (field.type === 'checkbox') return <div className={`field ${field.full ? 'full' : ''}`}><div className="check-field"><input id={`field-${field.name}`} name={field.name} type="checkbox" defaultChecked={!!value} /><label htmlFor={`field-${field.name}`}>{t(field.label)}</label></div>{field.help && <small>{t(field.help)}</small>}</div>;
   const common = { name: field.name, id: `field-${field.name}`, defaultValue: value, required: field.required, placeholder: field.placeholder ? t(field.placeholder) : undefined };
+  if (field.name === 'mode') return <div className="field full mode-field"><label>{t(field.label)}</label><div className="mode-picker" role="radiogroup" aria-label={t(field.label)}>{tunnelModeOptions.map(option => {
+    const selected = String(value) === String(option.value);
+    return <label className={`mode-option ${selected ? 'selected' : ''}`} key={option.value}>
+      <input name={field.name} type="radio" value={option.value} defaultChecked={selected} required={field.required} />
+      <span className="mode-option-copy"><strong>{t(option.label)}</strong><small>{t(tunnelModeDetails[String(option.value)])}</small></span>
+    </label>;
+  })}</div>{field.help && <small>{t(field.help)}</small>}</div>;
   return <div className={`field ${field.full ? 'full' : ''}`}><label htmlFor={common.id}>{t(field.label)}</label>
     {field.type === 'textarea' ? <textarea {...common} rows={4} /> : field.type === 'select' ? <select {...common}>{field.name === 'client_id' && <option value="" disabled>{t('选择客户端')}</option>}{(options || field.options)?.map(option => <option value={option.value} key={option.value}>{t(option.label)}</option>)}</select> : <input {...common} type={field.type || 'text'} step={field.type === 'number' ? 1 : undefined} />}
     {field.help && <small>{t(field.help)}</small>}
@@ -439,23 +444,26 @@ function Field({ field, value, options }: { field: FieldSpec; value: any; option
 
 function isEnabled(item: AnyRecord, resource: string) {
   if (resource === 'hosts') return !item.is_close;
-  if (resource === 'users') return Number(item.status) === 1;
-  if (resource === 'webhooks') return !!item.enabled;
   return item.run_status ?? item.status ?? item.is_connect;
 }
 
 function renderCell(item: AnyRecord, key: string, kind = '', t: (value: string) => string) {
   const value = item[key];
   if (kind === 'title') return <div><div className="cell-title">{value || t('未命名')}</div>{item.id && key !== 'username' && <div className="cell-sub">#{item.id}</div>}</div>;
-  if (kind === 'online' || kind === 'inverseOnline' || kind === 'userStatus') {
-    const enabled = kind === 'inverseOnline' ? !value : kind === 'userStatus' ? Number(value) === 1 : !!value;
+  if (kind === 'online' || kind === 'inverseOnline') {
+    const enabled = kind === 'inverseOnline' ? !value : !!value;
     return <span className={`badge ${enabled ? 'ok' : 'off'}`}>{t(enabled ? '正常' : '停用')}</span>;
   }
   if (kind === 'bytes') return <span className="mono">{formatBytes(Number(value || 0), key.includes('rate'))}{key.includes('rate') && '/s'}</span>;
   if (kind === 'time') return value ? new Date(Number(value) * 1000).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : t('无限制');
   if (kind === 'mono' || kind === 'id' || kind === 'number') return <span className="mono">{String(value ?? '-')}</span>;
-  if (kind === 'mode') return <span className="badge">{String(value || '-')}</span>;
+  if (kind === 'mode') return <span className="badge mode-badge">{modeLabel(value, t)}</span>;
   return String(value ?? '-');
+}
+
+function modeLabel(value: unknown, t: (value: string) => string) {
+  const option = tunnelModeOptions.find(item => String(item.value) === String(value));
+  return option ? t(option.label) : String(value || '-');
 }
 
 function resourceID(item: AnyRecord) {
@@ -528,6 +536,5 @@ function sortFieldForResource(resource: string, key: string) {
   const common: Record<string, string> = { id: 'Id', remark: 'Remark', client_id: 'Client.Id', target: 'Target.TargetStr', port: 'Port', mode: 'Mode', status: 'Status', is_connect: 'IsConnect', now_conn: 'NowConn', expire_at: 'ExpireAt', total_bytes: 'TotalFlow', service_total_bytes: 'TotalFlow', now_rate_total_bps: 'NowRate', service_now_rate_total_bps: 'NowRate', run_status: 'Status' };
   if (resource === 'clients') return ({ ...common, addr: 'Addr', version: 'Version', total_now_rate_total_bps: 'NowRate' } as Record<string, string>)[key] || 'Id';
   if (resource === 'hosts') return ({ ...common, host: 'Host', is_close: 'Status' } as Record<string, string>)[key] || 'Id';
-  if (resource === 'users') return ({ ...common, username: 'Username', kind: 'Kind', max_clients: 'ClientCount', max_tunnels: 'TunnelCount', max_hosts: 'HostCount' } as Record<string, string>)[key] || 'Id';
   return common[key] || 'Id';
 }

@@ -23,10 +23,7 @@ export default function Dashboard({ discovery, notify }: { discovery: Discovery;
     inFlight.current = true;
     if (!silent) setLoading(true);
     try {
-      const canReadConfig = discovery.actions.some(action => action.resource === 'system' && action.action === 'export');
-      const separator = overviewURL.includes('?') ? '&' : '?';
-      const overviewRequestURL = canReadConfig ? `${overviewURL}${separator}config=true` : overviewURL;
-      const response = await request<AnyRecord>(overviewRequestURL);
+      const response = await request<AnyRecord>(overviewURL);
       const legacy = response.data || response;
       setData({
         registration: { version: legacy.version, counts: { clients: legacy.clientCount, online_clients: legacy.clientOnlineCount, tunnels: Number(legacy.tcpC || 0) + Number(legacy.udpCount || 0) + Number(legacy.secretCount || 0) + Number(legacy.socks5Count || 0) + Number(legacy.p2pCount || 0) + Number(legacy.httpProxyCount || 0), hosts: legacy.hostCount } },
@@ -45,7 +42,7 @@ export default function Dashboard({ discovery, notify }: { discovery: Discovery;
       inFlight.current = false;
       setLoading(false);
     }
-  }, [discovery.actions, discovery.routes, notify]);
+  }, [discovery.routes, notify]);
 
   useEffect(() => {
     void load();
@@ -75,7 +72,7 @@ export default function Dashboard({ discovery, notify }: { discovery: Discovery;
     const display = data?.display || registration.display || {};
     const health = registration.health || {};
     const summary = usage.summary || {};
-    return { registration, counts, display, health, summary, config: data?.runtime_config || {} };
+    return { registration, counts, display, health, summary };
   }, [data]);
   const history = useMemo(() => Object.entries(runtime)
     .filter(([key, value]) => /^sys\d+$/.test(key) && value && typeof value === 'object')
@@ -90,11 +87,11 @@ export default function Dashboard({ discovery, notify }: { discovery: Discovery;
   ].filter(([, value]) => Number(value || 0) > 0) as Array<[string, number]>;
   const modeTotal = modes.reduce((total, [, value]) => total + Number(value || 0), 0);
 
-  return <div className="page-enter"><header className="page-header"><div><h1>{t('运行概览')}</h1><p>{t('节点状态、资源规模与管理链路')}</p></div><div className="page-actions"><span className={`poll-state ${pollError ? 'error' : 'ok'}`} title={pollError || t('实时更新正常')}>{pollError ? <AlertTriangle size={14} /> : null}{updatedAt ? new Date(updatedAt).toLocaleTimeString() : t('连接中')}</span><button className="icon-btn" onClick={() => void load()} aria-label={t('刷新')} title={t('刷新')} disabled={loading}><RefreshCw className={loading ? 'spin' : ''} /></button></div></header>
+  return <div className="page-enter"><header className="page-header"><div><h1>{t('运行概览')}</h1><p>{t('节点状态、资源规模与入口流量')}</p></div><div className="page-actions"><span className={`poll-state ${pollError ? 'error' : 'ok'}`} title={pollError || t('实时更新正常')}>{pollError ? <AlertTriangle size={14} /> : null}{updatedAt ? new Date(updatedAt).toLocaleTimeString() : t('连接中')}</span><button className="icon-btn" onClick={() => void load()} aria-label={t('刷新')} title={t('刷新')} disabled={loading}><RefreshCw className={loading ? 'spin' : ''} /></button></div></header>
     <div className="metric-grid">
       <Metric label={t('客户端')} value={loading && !data ? '—' : view.counts.clients ?? 0} note={`${view.counts.online_clients ?? 0} ${t('在线')}`} progress={percent(view.counts.online_clients, view.counts.clients)} />
       <Metric label={t('隧道')} value={loading && !data ? '—' : view.counts.tunnels ?? 0} note={t('当前可见资源')} color="var(--blue)" progress={64} />
-      <Metric label={t('域名代理')} value={loading && !data ? '—' : view.counts.hosts ?? 0} note={`${view.counts.users ?? 0} ${t('个用户')}`} color="var(--warning)" progress={46} />
+      <Metric label={t('域名代理')} value={loading && !data ? '—' : view.counts.hosts ?? 0} note={t('HTTP / HTTPS 入口')} color="var(--warning)" progress={46} />
       <Metric label={t('累计流量')} value={loading && !data ? '—' : formatBytes(totalTraffic)} note={`${t('上行')} ${formatBytes(view.summary.total_in_bytes || 0)} · ${t('下行')} ${formatBytes(view.summary.total_out_bytes || 0)}`} progress={72} />
     </div>
     <div className="panel-grid">
@@ -108,7 +105,6 @@ export default function Dashboard({ discovery, notify }: { discovery: Discovery;
         <Detail label={t('主桥接地址')} value={endpoint(view.display.bridge?.primary)} mono /><Detail label="TCP" value={transport(view.display.bridge?.tcp, t)} mono />
         <Detail label="TLS" value={transport(view.display.bridge?.tls, t)} mono /><Detail label="KCP" value={transport(view.display.bridge?.kcp, t)} mono />
         <Detail label="WebSocket" value={transport(view.display.bridge?.ws, t)} mono /><Detail label="HTTP / HTTPS" value={`${view.display.http_proxy_port || '-'} / ${view.display.https_proxy_port || '-'}`} mono />
-        <Detail label={t('回调积压')} value={view.health.callback_queue_backlog ?? 0} />
       </dl></section>
     </div>
     {Object.keys(runtime).length > 0 && <section className="panel section-gap"><header className="panel-head"><Server size={16} />&nbsp;&nbsp;{t('系统运行指标')}</header>
@@ -122,15 +118,6 @@ export default function Dashboard({ discovery, notify }: { discovery: Discovery;
       {history.length > 0 && <TrendPanel history={history} t={t} />}
       {modes.length > 0 && <section className="distribution"><h3>{t('隧道模式分布')}</h3>{modes.map(([label, value]) => <div className="distribution-row" key={label}><span>{label}</span><div className="distribution-track"><i style={{ width: `${Math.max(3, Number(value) / modeTotal * 100)}%` }} /></div><strong>{value}</strong></div>)}</section>}
     </section>}
-    {discovery.actions.some(action => action.resource === 'system' && action.action === 'export') && Object.keys(view.config).length > 0 && <section className="panel section-gap"><header className="panel-head"><Server size={16} />&nbsp;&nbsp;{t('节点配置')}</header><dl className="details-list config-summary">
-      <Detail label={t('入口 IP 限制')} value={configValue(view.config, ['ip_limit', 'web_ip'], []) || '-'} />
-      <Detail label={t('日志级别')} value={configValue(view.config, ['log_level'], []) || '-'} />
-      <Detail label={t('P2P 地址')} value={`${configValue(view.config, ['p2p_ip'], []) || '-'}:${configValue(view.config, ['p2p_port'], []) || '-'}`} mono />
-      <Detail label={t('运行模式')} value={configValue(view.config, ['run_mode'], []) || '-'} />
-      <Detail label={t('流量持久化间隔')} value={configValue(view.config, ['flow_store_interval'], []) || '-'} />
-      <Detail label="HTTP / HTTPS" value={`${configValue(view.config, ['http_proxy_port'], []) || '-'} / ${configValue(view.config, ['https_proxy_port'], []) || '-'}`} />
-      <Detail label={t('桥接协议 / WebSocket 路径')} value={`${configValue(view.config, ['bridge_type'], []) || '-'} / ${configValue(view.config, ['bridge_path'], []) || '-'}`} />
-    </dl></section>}
   </div>;
 }
 
@@ -150,8 +137,3 @@ function transport(value: AnyRecord = {}, t: (source: string) => string) { retur
 function parseLoad(value: unknown) { if (value && typeof value === 'object') return value as AnyRecord; try { return JSON.parse(String(value || '{}')); } catch { return {}; } }
 function formatNumber(value: unknown) { const number = Number(value); return Number.isFinite(number) ? number.toFixed(2) : '-'; }
 function formatDuration(seconds: number, language: 'zh' | 'en', t: (source: string) => string) { const days = Math.floor(seconds / 86400); const hours = Math.floor(seconds % 86400 / 3600); const minutes = Math.floor(seconds % 3600 / 60); return language === 'en' ? `${days ? `${days}${t('天')} ` : ''}${hours}${t('小时')} ${minutes}${t('分')}` : `${days ? `${days}天 ` : ''}${hours}小时 ${minutes}分`; }
-function configValue(config: AnyRecord, paths: string[], flatKeys: string[]) {
-  for (const path of paths) { const value = path.split('.').reduce<any>((current, key) => current?.[key], config); if (value !== undefined && value !== null && value !== '') return value; }
-  for (const key of flatKeys) if (config[key] !== undefined && config[key] !== null && config[key] !== '') return config[key];
-  return '';
-}

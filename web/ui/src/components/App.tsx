@@ -1,4 +1,4 @@
-import { Activity, Ban, Cable, ChevronRight, CircleGauge, CircleHelp, Globe2, Languages, LogOut, Menu, Moon, Network, RefreshCw, ServerCog, Settings, Sun, Users, Webhook, type LucideIcon } from 'lucide-react';
+import { Ban, Cable, ChevronRight, CircleGauge, CircleHelp, Globe2, Languages, LogOut, Menu, Moon, Network, RefreshCw, ServerCog, Settings, Sun, type LucideIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { actionMap, clearAccessToken, getDiscovery } from '../lib/api';
 import { resourceSpecs } from '../lib/forms';
@@ -6,16 +6,14 @@ import { I18nProvider, useI18n } from '../lib/i18n';
 import type { Discovery, PageKey } from '../lib/types';
 import AuthScreen from './AuthScreen';
 import Dashboard from './Dashboard';
-import { BanList, CallbackQueue, GlobalSettings } from './SettingsPage';
+import { BanList, GlobalSettings } from './SettingsPage';
 import ResourcePage from './ResourcePage';
 import { Toasts, type ToastItem } from './Overlay';
-import OperationsPage from './OperationsPage';
 
 const pageInfo: Record<PageKey, { label: string; icon: LucideIcon }> = {
   dashboard: { label: '运行概览', icon: CircleGauge }, clients: { label: '客户端', icon: Cable }, tunnels: { label: '隧道', icon: Network },
-  hosts: { label: '域名代理', icon: Globe2 }, users: { label: '用户', icon: Users }, settings: { label: '全局设置', icon: Settings },
-  bans: { label: '封禁列表', icon: Ban }, callbacks: { label: '回调队列', icon: Webhook },
-  webhooks: { label: 'Webhook', icon: Webhook }, operations: { label: '系统运维', icon: Activity },
+  hosts: { label: '域名代理', icon: Globe2 }, settings: { label: '全局设置', icon: Settings },
+  bans: { label: '封禁列表', icon: Ban },
 };
 
 export default function App() {
@@ -42,9 +40,7 @@ function AppContent() {
     const available: PageKey[] = [];
     if (discovery.routes.overview || discovery.routes.dashboard || discovery.routes.status) available.push('dashboard');
     if (actions.has('clients:list')) available.push('clients'); if (actions.has('tunnels:list')) available.push('tunnels'); if (actions.has('hosts:list')) available.push('hosts');
-    if (actions.has('users:list')) available.push('users'); if (actions.has('settings_global:read')) available.push('settings'); if (actions.has('security_bans:list')) available.push('bans'); if (actions.has('callbacks_queue:list')) available.push('callbacks');
-    if (actions.has('webhooks:list')) available.push('webhooks');
-    if (actions.has('system:operations') || actions.has('system:changes') || actions.has('system:usage_snapshot') || actions.has('system:export') || actions.has('system:import') || actions.has('system:sync')) available.push('operations');
+    if (actions.has('settings_global:read')) available.push('settings'); if (actions.has('security_bans:list')) available.push('bans');
     return available;
   }, [actions, discovery]);
   useEffect(() => { if (pages.length && !pages.includes(page)) navigate(pages[0]); }, [pages, page]);
@@ -72,10 +68,8 @@ function AppContent() {
 
 function renderPage(page: PageKey, discovery: Discovery, actions: ReturnType<typeof actionMap>, notify: (message: string, type?: 'success' | 'error') => void) {
   if (page === 'dashboard') return <Dashboard discovery={discovery} notify={notify} />;
-  if (page === 'settings') return <GlobalSettings discovery={discovery} actions={actions} notify={notify} />;
+  if (page === 'settings') return <GlobalSettings actions={actions} notify={notify} />;
   if (page === 'bans') return <BanList actions={actions} notify={notify} />;
-  if (page === 'callbacks') return <CallbackQueue actions={actions} notify={notify} />;
-  if (page === 'operations') return <OperationsPage discovery={discovery} actions={actions} notify={notify} />;
   return <ResourcePage discovery={discovery} actions={actions} spec={resourceSpecs[page]} notify={notify} />;
 }
 export function hashQuery() {

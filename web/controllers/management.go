@@ -10,6 +10,7 @@ import (
 	"github.com/beego/beego"
 	"github.com/djylb/nps/lib/common"
 	"github.com/djylb/nps/lib/crypt"
+	"github.com/djylb/nps/lib/file"
 	"github.com/djylb/nps/server"
 )
 
@@ -77,6 +78,19 @@ func (s *ManagementController) Meta() {
 		{"resource": "hosts", "action": "stop", "method": "POST", "path": basePath("/index/stophost?id={id}")},
 		{"resource": "hosts", "action": "clear", "method": "POST", "path": basePath("/index/clearhost?id={id}&mode=flow")},
 	}
+	// These endpoints belong to the legacy administrator surface. Keep them
+	// out of the catalog for regular users so the UI cannot expose controls
+	// they are not allowed to execute.
+	if isAdmin, ok := s.GetSession("isAdmin").(bool); ok && isAdmin {
+		actions = append(actions,
+			map[string]interface{}{"resource": "settings_global", "action": "read", "method": "GET", "path": basePath("/management/global")},
+			map[string]interface{}{"resource": "settings_global", "action": "update", "method": "POST", "path": basePath("/management/global")},
+			map[string]interface{}{"resource": "security_bans", "action": "list", "method": "POST", "path": basePath("/global/banlist")},
+			map[string]interface{}{"resource": "security_bans", "action": "delete", "method": "POST", "path": basePath("/global/unban")},
+			map[string]interface{}{"resource": "security_bans", "action": "delete_all", "method": "POST", "path": basePath("/global/unbanall")},
+			map[string]interface{}{"resource": "security_bans", "action": "clean", "method": "POST", "path": basePath("/global/banclean")},
+		)
+	}
 	meta := map[string]interface{}{
 		"app": map[string]interface{}{"name": "NPS", "version": server.GetVersion()},
 		"session": map[string]interface{}{
@@ -99,6 +113,10 @@ func (s *ManagementController) Meta() {
 		},
 		"features": map[string]interface{}{
 			"allow_user_register":        false,
+			"allow_user_login":           beego.AppConfig.DefaultBool("allow_user_login", true),
+			"allow_user_change_username": beego.AppConfig.DefaultBool("allow_user_change_username", false),
+			"allow_user_local":           beego.AppConfig.DefaultBool("allow_user_local", beego.AppConfig.DefaultBool("allow_local_proxy", false)),
+			"allow_secret_link":          beego.AppConfig.DefaultBool("allow_secret_link", false),
 			"allow_flow_limit":           beego.AppConfig.DefaultBool("allow_flow_limit", false),
 			"allow_rate_limit":           beego.AppConfig.DefaultBool("allow_rate_limit", false),
 			"allow_time_limit":           beego.AppConfig.DefaultBool("allow_time_limit", false),
@@ -114,5 +132,32 @@ func (s *ManagementController) Meta() {
 		}
 	}
 	s.Data["json"] = meta
+	s.ServeJSON()
+}
+
+// Global returns the small, administrator-editable portion of the legacy
+// global configuration in the shape consumed by the migrated UI.
+func (s *ManagementController) Global() {
+	if s.GetSession("isAdmin") != true {
+		s.CustomAbort(http.StatusForbidden, "administrator access required")
+		return
+	}
+	if s.Ctx.Request.Method == http.MethodGet {
+		global := file.GetDb().GetGlobal()
+		rules := ""
+		if global != nil {
+			rules = strings.Join(global.BlackIpList, "\n")
+		}
+		s.Data["json"] = map[string]interface{}{"item": map[string]interface{}{"entry_acl_mode": 0, "entry_acl_rules": rules}}
+		s.ServeJSON()
+		return
+	}
+	rules := strings.TrimSpace(strings.ReplaceAll(s.GetString("entry_acl_rules"), "\r\n", "\n"))
+	if err := file.GetDb().SaveGlobal(&file.Glob{BlackIpList: RemoveRepeatedElement(strings.Split(rules, "\n"))}); err != nil {
+		s.Data["json"] = map[string]interface{}{"status": 0, "msg": err.Error()}
+		s.ServeJSON()
+		return
+	}
+	s.Data["json"] = map[string]interface{}{"status": 1, "msg": "save success"}
 	s.ServeJSON()
 }
