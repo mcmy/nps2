@@ -6,3 +6,11 @@ npc
 *.tar.gz
 *.json
 *.tmp
+
+# The migrated management UI is source-controlled; dependencies remain ignored.
+!web/ui/
+!web/ui/**
+web/ui/node_modules/
+web/ui/.astro/
+!web/static/app/
+!web/static/app/**

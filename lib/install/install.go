@@ -418,9 +418,9 @@ func InstallNps() string {
 	path := common.GetInstallPath()
 	log.Println("install path:" + path)
 	if common.FileExists(path) {
-		MkidrDirAll(path, "web/static", "web/views")
+		MkidrDirAll(path, "web/static")
 	} else {
-		MkidrDirAll(path, "conf", "web/static", "web/views")
+		MkidrDirAll(path, "conf", "web/static")
 		// not copy config if the config file is exist
 		if err := CopyDir(filepath.Join(common.GetAppPath(), "conf"), filepath.Join(path, "conf")); err != nil {
 			log.Fatalln(err)

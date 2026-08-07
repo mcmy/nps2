@@ -18,9 +18,9 @@ tar -czvf windows_amd64_client_old.tar.gz npc.exe conf/npc.conf conf/multi_accou
 
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -extldflags -static -extldflags -static -X 'github.com/djylb/nps/lib/install.BuildTarget=win7'" ./cmd/nps/nps.go
 
-tar -czvf windows_amd64_server_old.tar.gz conf/nps.conf web/views web/static nps.exe
+tar -czvf windows_amd64_server_old.tar.gz conf/nps.conf web/static nps.exe
 
 
 CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags "-s -w -extldflags -static -extldflags -static -X 'github.com/djylb/nps/lib/install.BuildTarget=win7'" ./cmd/nps/nps.go
 
-tar -czvf windows_386_server_old.tar.gz conf/nps.conf web/views web/static nps.exe
+tar -czvf windows_386_server_old.tar.gz conf/nps.conf web/static nps.exe

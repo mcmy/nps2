@@ -1,0 +1,290 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'release/v*'
+      - 'dev/v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-release:
+    name: Build release archives
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/ui/package-lock.json
+
+      - name: Build management UI
+        run: |
+          cd web/ui
+          npm ci
+          npm run build
+
+      - name: Build release archives
+        run: |
+          chmod +x build.assets.sh
+          ./build.assets.sh
+
+      - name: Upload release archives
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-archives-native
+          path: '*.tar.gz'
+          if-no-files-found: error
+
+  build-docker:
+    name: Build and push ${{ matrix.image }} image
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [nps, npc]
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v7
+
+      - name: Resolve image tag
+        id: image-tag
+        shell: bash
+        run: |
+          ref="$GITHUB_REF_NAME"
+          case "$ref" in
+            release/v*)
+              version="${ref#release/}"
+              image_tag="$version"
+              channel="stable"
+              ;;
+            dev/v*)
+              version="${ref#dev/}"
+              image_tag="dev"
+              channel="dev"
+              ;;
+            *)
+              echo "Unsupported tag: $ref" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "image_tag=$image_tag" >> "$GITHUB_OUTPUT"
+          echo "image_tags<<EOF" >> "$GITHUB_OUTPUT"
+          echo "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ matrix.image }}:${image_tag}" >> "$GITHUB_OUTPUT"
+          if [[ "$channel" == "stable" ]]; then
+            echo "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ matrix.image }}:latest" >> "$GITHUB_OUTPUT"
+          fi
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.${{ matrix.image }}
+          platforms: linux/amd64,linux/arm,linux/arm64,linux/386,linux/ppc64le,linux/s390x
+          push: true
+          tags: ${{ steps.image-tag.outputs.image_tags }}
+
+      - name: Package every image architecture
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="${{ steps.image-tag.outputs.image_tag }}"
+          image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ matrix.image }}:${tag}"
+          platforms=(linux/amd64 linux/arm linux/arm64 linux/386 linux/ppc64le linux/s390x)
+
+          case "${{ matrix.image }}" in
+            nps) suffix="server" ;;
+            npc) suffix="client" ;;
+          esac
+
+          mkdir -p dist/release
+          for platform in "${platforms[@]}"; do
+            platform_name="${platform//\//_}"
+            stage_dir="$(mktemp -d)"
+            container_id=""
+
+            cleanup() {
+              if [[ -n "$container_id" ]]; then
+                docker rm "$container_id" >/dev/null 2>&1 || true
+              fi
+              rm -rf -- "$stage_dir"
+            }
+            trap cleanup EXIT
+
+            echo "Packaging $image for $platform"
+            docker pull --platform "$platform" "$image"
+            container_id="$(docker create --platform "$platform" "$image")"
+            mkdir -p "$stage_dir/conf"
+
+            if [[ "${{ matrix.image }}" == "nps" ]]; then
+              docker cp "$container_id:/nps" "$stage_dir/nps"
+              docker cp "$container_id:/nps.conf.sample" "$stage_dir/conf/nps.conf"
+              docker cp "$container_id:/web" "$stage_dir/web"
+              archive_entries=(nps conf web)
+            else
+              docker cp "$container_id:/npc" "$stage_dir/npc"
+              cp conf/npc.conf conf/multi_account.conf "$stage_dir/conf/"
+              archive_entries=(npc conf)
+            fi
+
+            tar -czf "dist/release/docker_${platform_name}_${suffix}.tar.gz" \
+              -C "$stage_dir" "${archive_entries[@]}"
+
+            trap - EXIT
+            cleanup
+          done
+
+      - name: Upload image release archives
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-archives-${{ matrix.image }}
+          path: dist/release/*.tar.gz
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-release, build-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v7
+
+      - name: Download release archives
+        uses: actions/download-artifact@v8
+        with:
+          pattern: release-archives-*
+          path: dist/release
+          merge-multiple: true
+
+      - name: Resolve release channel
+        id: release-channel
+        shell: bash
+        run: |
+          ref="$GITHUB_REF_NAME"
+          case "$ref" in
+            release/v*)
+              version="${ref#release/}"
+              channel_tag="latest"
+              channel="stable"
+              ;;
+            dev/v*)
+              version="${ref#dev/}"
+              channel_tag="pre"
+              channel="dev"
+              ;;
+            *)
+              echo "Unsupported tag: $ref" >&2
+              exit 1
+              ;;
+          esac
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "channel_tag=$channel_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare release notes
+        shell: bash
+        run: |
+          tag="${{ steps.release-channel.outputs.version }}"
+          custom_notes="release-notes/${tag}.md"
+
+          if [[ -f "$custom_notes" ]]; then
+            cp "$custom_notes" release-notes.md
+          else
+            awk -v tag="$tag" '
+              BEGIN { header = "### " tag; found = 0 }
+              ($0 == header || index($0, header " (") == 1) { found = 1; next }
+              found && /^### / { exit }
+              found { print }
+            ' CHANGELOG.md > release-notes.md
+          fi
+
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            if [[ "${{ steps.release-channel.outputs.channel }}" == "dev" ]]; then
+              printf 'Development pre-release for %s.\n' "$tag" > release-notes.md
+            else
+              echo "No release notes found for $tag" >&2
+              exit 1
+            fi
+          fi
+
+      - name: Create or update versioned GitHub Release
+        if: steps.release-channel.outputs.channel == 'stable'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release-channel.outputs.version }}
+          name: ${{ steps.release-channel.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          prerelease: false
+          make_latest: true
+          body_path: release-notes.md
+          files: dist/release/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Move channel tag
+        shell: bash
+        run: |
+          tag="${{ steps.release-channel.outputs.channel_tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag --force "$tag" "$GITHUB_SHA"
+          git push origin "refs/tags/$tag" --force
+
+      - name: Create or update pre-release
+        if: steps.release-channel.outputs.channel == 'dev'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: pre
+          name: pre
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          make_latest: false
+          body_path: release-notes.md
+          files: dist/release/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update latest GitHub Release
+        if: steps.release-channel.outputs.channel == 'stable'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: latest
+          target_commitish: ${{ github.sha }}
+          prerelease: false
+          make_latest: false
+          body_path: release-notes.md
+          files: dist/release/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

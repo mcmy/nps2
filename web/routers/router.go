@@ -16,7 +16,8 @@ func Init() {
 	webBaseUrl := beego.AppConfig.String("web_base_url")
 	if len(webBaseUrl) > 0 {
 		ns := beego.NewNamespace(webBaseUrl,
-			beego.NSRouter("/", &controllers.IndexController{}, "*:Index"),
+			beego.NSRouter("/", &controllers.ManagementController{}, "get:Index"),
+			beego.NSRouter("/management/meta", &controllers.ManagementController{}, "get:Meta"),
 			beego.NSAutoRouter(&controllers.IndexController{}),
 			beego.NSAutoRouter(&controllers.LoginController{}),
 			beego.NSAutoRouter(&controllers.ClientController{}),
@@ -25,7 +26,8 @@ func Init() {
 		)
 		beego.AddNamespace(ns)
 	} else {
-		beego.Router("/", &controllers.IndexController{}, "*:Index")
+		beego.Router("/", &controllers.ManagementController{}, "get:Index")
+		beego.Router("/management/meta", &controllers.ManagementController{}, "get:Meta")
 		beego.AutoRouter(&controllers.IndexController{})
 		beego.AutoRouter(&controllers.LoginController{})
 		beego.AutoRouter(&controllers.ClientController{})

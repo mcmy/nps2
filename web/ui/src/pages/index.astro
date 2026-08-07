@@ -1,0 +1,19 @@
+---
+import App from '../components/App';
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7f9" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="__NPS_BASE__/static/img/nps.svg" />
+    <title>NPS Console</title>
+  </head>
+  <body>
+    <App client:only="react" />
+  </body>
+</html>
