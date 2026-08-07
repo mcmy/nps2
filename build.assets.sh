@@ -11,7 +11,7 @@ echo "Updated go.mod to Go version: $CURRENT_GO_VERSION"
 sudo apt-get update
 sudo apt-get install -y gcc-mingw-w64-i686 gcc-multilib
 
-COMMON_LDFLAGS="-s -w -extldflags -static -extldflags -static"
+COMMON_LDFLAGS="-s -w"
 
 TARGETS=(
   "android arm64"
@@ -21,10 +21,6 @@ TARGETS=(
   "freebsd amd64"
   "freebsd arm64"
   "freebsd arm"
-  "linux 386"
-  "linux amd64"
-  "linux arm64"
-  "linux arm"
   "linux arm 5"
   "linux arm 6"
   "linux arm 7"

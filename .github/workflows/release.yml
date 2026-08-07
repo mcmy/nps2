@@ -51,13 +51,6 @@ jobs:
           path: '*.tar.gz'
           if-no-files-found: error
 
-      - name: Cancel workflow on failure
-        if: ${{ failure() }}
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh run cancel "$GITHUB_RUN_ID" || true
-
   build-docker:
     name: Build and push ${{ matrix.image }} image
     runs-on: ubuntu-latest
@@ -87,9 +80,16 @@ jobs:
             exit 1
           fi
 
+          go_version="$(awk '$1 == "go" { print $2; exit }' go.mod)"
+          if [[ -z "$go_version" ]]; then
+            echo "Unable to resolve Go version from go.mod" >&2
+            exit 1
+          fi
+
           echo "channel=$channel" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "image_tag=$image_tag" >> "$GITHUB_OUTPUT"
+          echo "go_version=$go_version" >> "$GITHUB_OUTPUT"
           echo "image_tags<<EOF" >> "$GITHUB_OUTPUT"
           echo "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ matrix.image }}:${image_tag}" >> "$GITHUB_OUTPUT"
           if [[ "$channel" == "stable" ]]; then
@@ -118,15 +118,17 @@ jobs:
           platforms: linux/amd64,linux/arm,linux/arm64,linux/386,linux/ppc64le,linux/s390x
           push: true
           tags: ${{ steps.image-tag.outputs.image_tags }}
+          build-args: |
+            GO_VERSION=${{ steps.image-tag.outputs.go_version }}
 
-      - name: Package every image architecture
+      - name: Package Linux release archives
         shell: bash
         run: |
           set -euo pipefail
 
           tag="${{ steps.image-tag.outputs.image_tag }}"
           image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ matrix.image }}:${tag}"
-          platforms=(linux/amd64 linux/arm linux/arm64 linux/386 linux/ppc64le linux/s390x)
+          platforms=(linux/386 linux/amd64 linux/arm linux/arm64 linux/ppc64le linux/s390x)
 
           case "${{ matrix.image }}" in
             nps) suffix="server" ;;
@@ -163,7 +165,7 @@ jobs:
               archive_entries=(npc conf)
             fi
 
-            tar -czf "dist/release/docker_${platform_name}_${suffix}.tar.gz" \
+            tar -czf "dist/release/${platform_name}_${suffix}.tar.gz" \
               -C "$stage_dir" "${archive_entries[@]}"
 
             trap - EXIT
@@ -176,13 +178,6 @@ jobs:
           name: release-archives-${{ matrix.image }}
           path: dist/release/*.tar.gz
           if-no-files-found: error
-
-      - name: Cancel workflow on failure
-        if: ${{ failure() }}
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh run cancel "$GITHUB_RUN_ID" || true
 
   publish-release:
     name: Publish GitHub Release
@@ -259,7 +254,6 @@ jobs:
           files: dist/release/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Move channel tag
         shell: bash
         run: |
@@ -296,10 +290,3 @@ jobs:
           files: dist/release/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Cancel workflow on failure
-        if: ${{ failure() }}
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh run cancel "$GITHUB_RUN_ID" || true
