@@ -47,7 +47,7 @@ docker run -d --restart=always --name npc --net=host ghcr.io/mcmy/npc -server=xx
 ### 2.1 NPS
 ```bash
 # Install (default configuration path: /etc/nps/; binary file path: /usr/bin/)
-wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@master/install.sh | sudo sh -s nps
+wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@main/install.sh | sudo sh -s nps
 nps install
 nps start|stop|restart|uninstall
 
@@ -58,7 +58,7 @@ nps update && nps restart
 ### 2.2 NPC
 ```bash
 # Install
-wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@master/install.sh | sudo sh -s npc
+wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@main/install.sh | sudo sh -s npc
 /usr/bin/npc install -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls -log=off
 npc start|stop|restart|uninstall
 

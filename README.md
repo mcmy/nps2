@@ -9,7 +9,7 @@ A high-performance NAT traversal and reverse proxy server with Web UI.
 
 > ⭐️ Give us a star on [GitHub](https://github.com/mcmy/nps2) if you like it!
 
-- [中文文档](https://github.com/mcmy/nps2/blob/master/README_zh.md)
+- [中文文档](https://github.com/mcmy/nps2/blob/main/README_zh.md)
 
 ---
 
@@ -89,7 +89,7 @@ docker run -d --restart=always --name npc --net=host duan2001/npc -server=xxx:12
 
 ```bash
 # Install (default configuration path: /etc/nps/; binary file path: /usr/bin/)
-wget -qO- https://raw.githubusercontent.com/mcmy/nps2/refs/heads/master/install.sh | sudo sh -s nps
+wget -qO- https://raw.githubusercontent.com/mcmy/nps2/refs/heads/main/install.sh | sudo sh -s nps
 nps install
 nps start|stop|restart|uninstall
 
@@ -118,7 +118,7 @@ nps update && nps restart
 #### Linux
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/mcmy/nps2/refs/heads/master/install.sh | sudo sh -s npc
+wget -qO- https://raw.githubusercontent.com/mcmy/nps2/refs/heads/main/install.sh | sudo sh -s npc
 /usr/bin/npc install -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls -log=off
 npc start|stop|restart|uninstall
 

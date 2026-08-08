@@ -135,7 +135,7 @@ npc.exe uninstall
 ```
 
 📌 **示例配置文件**：
-[📌 示例 `npc.conf`](https://github.com/mcmy/nps2/tree/master/conf/npc.conf)
+[📌 示例 `npc.conf`](https://github.com/mcmy/nps2/tree/main/conf/npc.conf)
 
 #### 全局配置
 

@@ -9,7 +9,7 @@
 
 > 由于 GitHub 限制浏览器语言为中文（Accept-Language=zh-CN) 访问 *.githubusercontent.com ，图标可能无法正常显示。
 
-- [English](https://github.com/mcmy/nps2/blob/master/README.md)
+- [English](https://github.com/mcmy/nps2/blob/main/README.md)
 
 ---
 
@@ -86,7 +86,7 @@ docker run -d --restart=always --name npc --net=host duan2001/npc -server=xxx:12
 #### Linux
 ```bash
 # 安装（默认配置路径：/etc/nps/；二进制文件路径：/usr/bin/）
-wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@master/install.sh | sudo sh -s nps
+wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@main/install.sh | sudo sh -s nps
 nps install
 nps start|stop|restart|uninstall
 
@@ -112,7 +112,7 @@ nps update && nps restart
 
 #### Linux
 ```bash
-wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@master/install.sh | sudo sh -s npc
+wget -qO- https://fastly.jsdelivr.net/gh/mcmy/nps2@main/install.sh | sudo sh -s npc
 /usr/bin/npc install -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls -log=off
 npc start|stop|restart|uninstall
 
