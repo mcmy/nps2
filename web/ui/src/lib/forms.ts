@@ -129,7 +129,7 @@ export const resourceSpecs: Record<string, ResourceSpec> = {
     searchKeys: ['id', 'remark', 'host', 'target', 'client_id'],
     columns: [
       { key: 'id', label: 'ID', kind: 'id' }, { key: 'host', label: '域名', kind: 'title' },
-      { key: 'scheme', label: '协议', kind: 'mode' }, { key: 'client_id', label: '客户端', kind: 'id' },
+      { key: 'scheme', label: '协议', kind: 'mode' }, { key: 'client_id', label: '客户端', kind: 'client' },
       { key: 'target', label: '目标', kind: 'mono' }, { key: 'is_close', label: '状态', kind: 'inverseOnline' },
       { key: 'now_rate_total_bps', label: '实时速率', kind: 'bytes' }, { key: 'service_total_bytes', label: '累计流量', kind: 'bytes' },
     ],
