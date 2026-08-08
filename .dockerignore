@@ -1,6 +1,11 @@
 .git
 .github
 .idea
+docs
+image
+README.md
+README_zh.md
+CHANGELOG.md
 
 *.spk
 *.tar.gz

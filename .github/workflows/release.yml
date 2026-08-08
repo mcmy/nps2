@@ -118,6 +118,8 @@ jobs:
           platforms: linux/amd64,linux/arm,linux/arm64,linux/386,linux/ppc64le,linux/s390x
           push: true
           tags: ${{ steps.image-tag.outputs.image_tags }}
+          cache-from: type=gha,scope=docker-${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=docker-${{ matrix.image }}
           build-args: |
             GO_VERSION=${{ steps.image-tag.outputs.go_version }}
 
