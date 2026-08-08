@@ -59,11 +59,20 @@ NPS 是一款轻量高效的内网穿透代理服务器，支持多种协议（T
 
 ### Docker 部署
 
-***GHCR***： [NPS](https://github.com/mcmy/nps2/pkgs/container/nps) [NPC](https://github.com/mcmy/nps2/pkgs/container/npc)
+***Docker Hub（默认）***： [NPS](https://hub.docker.com/r/gitmcmy/nps) [NPC](https://hub.docker.com/r/gitmcmy/npc)
+
+***GHCR（备用）***： [NPS](https://github.com/mcmy/nps2/pkgs/container/nps) [NPC](https://github.com/mcmy/nps2/pkgs/container/npc)
 
 > 有真实IP获取需求可配合 [mmproxy](https://github.com/djylb/mmproxy-docker) 使用。例如：SSH
 
 #### NPS 服务端
+```bash
+docker pull gitmcmy/nps
+docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /etc/localtime:/etc/localtime:ro gitmcmy/nps
+```
+
+GHCR 备用：
+
 ```bash
 docker pull ghcr.io/mcmy/nps
 docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /etc/localtime:/etc/localtime:ro ghcr.io/mcmy/nps
@@ -72,6 +81,13 @@ docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /et
 > **提示：** NPS 安装完成后，请先修改 `nps.conf`（如监听端口、Web 管理账号等）再启动服务。
 
 #### NPC 客户端
+```bash
+docker pull gitmcmy/npc
+docker run -d --restart=always --name npc --net=host gitmcmy/npc -server=xxx:123,yyy:456 -vkey=key1,key2 -type=tls,tcp -log=off
+```
+
+GHCR 备用：
+
 ```bash
 docker pull ghcr.io/mcmy/npc
 docker run -d --restart=always --name npc --net=host ghcr.io/mcmy/npc -server=xxx:123,yyy:456 -vkey=key1,key2 -type=tls,tcp -log=off

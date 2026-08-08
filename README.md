@@ -59,11 +59,20 @@ For more detailed configuration options, please refer to the [Documentation](htt
 
 ### Docker Deployment
 
-**GHCR:** [NPS](https://github.com/mcmy/nps2/pkgs/container/nps) | [NPC](https://github.com/mcmy/nps2/pkgs/container/npc)
+**Docker Hub (default):** [NPS](https://hub.docker.com/r/gitmcmy/nps) | [NPC](https://hub.docker.com/r/gitmcmy/npc)
+
+**GHCR (backup):** [NPS](https://github.com/mcmy/nps2/pkgs/container/nps) | [NPC](https://github.com/mcmy/nps2/pkgs/container/npc)
 
 > If you need to obtain the real client IP, you can use it together with [mmproxy](https://github.com/djylb/mmproxy-docker). For example: SSH.
 
 #### NPS Server
+
+```bash
+docker pull gitmcmy/nps
+docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /etc/localtime:/etc/localtime:ro gitmcmy/nps
+```
+
+GHCR fallback:
 
 ```bash
 docker pull ghcr.io/mcmy/nps
@@ -73,6 +82,13 @@ docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /et
 > **Tip:** After installing NPS, edit `nps.conf` (for example: listening ports and Web admin credentials) before starting the service.
 
 #### NPC Client
+
+```bash
+docker pull gitmcmy/npc
+docker run -d --restart=always --name npc --net=host gitmcmy/npc -server=xxx:123,yyy:456 -vkey=key1,key2 -type=tls,tcp -log=off
+```
+
+GHCR fallback:
 
 ```bash
 docker pull ghcr.io/mcmy/npc

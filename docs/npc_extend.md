@@ -125,6 +125,13 @@ proxy_url=socks5://111:222@127.0.0.1:8024
 
 📌 **推荐使用 Docker 部署**
 ```bash
+docker pull gitmcmy/npc
+docker run -d --restart=always --name npc --net=host gitmcmy/npc -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls,tcp -log=off
+```
+
+GHCR 备用：
+
+```bash
 docker pull ghcr.io/mcmy/npc
 docker run -d --restart=always --name npc --net=host ghcr.io/mcmy/npc -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls,tcp -log=off
 ```
