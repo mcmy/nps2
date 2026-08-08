@@ -72,6 +72,7 @@ func (s *IndexController) Add() {
 			FlowLimit: int64(s.GetIntNoErr("flow_limit")),
 			TimeLimit: common.GetTimeNoErrByStr(s.getEscapeString("time_limit")),
 		},
+		RateLimit: s.GetIntNoErr("rate_limit"),
 	}
 
 	if t.Port <= 0 {
@@ -194,6 +195,7 @@ func (s *IndexController) Edit() {
 	t.Remark = s.getEscapeString("remark")
 	t.Flow.FlowLimit = int64(s.GetIntNoErr("flow_limit"))
 	t.Flow.TimeLimit = common.GetTimeNoErrByStr(s.getEscapeString("time_limit"))
+	t.RateLimit = s.GetIntNoErr("rate_limit")
 	if s.GetBoolNoErr("flow_reset") {
 		t.Flow.ExportFlow = 0
 		t.Flow.InletFlow = 0

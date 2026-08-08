@@ -193,6 +193,9 @@ type Tunnel struct {
 	Client       *Client
 	Ports        string
 	Flow         *Flow
+	RateLimit    int        // per-direction rate limit (KB/s), 0 means unlimited
+	RateIn       *rate.Rate `json:"-"`
+	RateOut      *rate.Rate `json:"-"`
 	NowConn      int32
 	Password     string
 	Remark       string
@@ -213,6 +216,25 @@ type Tunnel struct {
 	MultiAccount *MultiAccount
 	Health
 	sync.RWMutex
+}
+
+func (t *Tunnel) SetRateLimit(limit int) {
+	if limit < 0 {
+		limit = 0
+	}
+	t.RateLimit = limit
+	if t.RateIn == nil {
+		t.RateIn = rate.NewRate(int64(limit) * 1024)
+	} else {
+		t.RateIn.ResetLimit(int64(limit) * 1024)
+	}
+	if t.RateOut == nil {
+		t.RateOut = rate.NewRate(int64(limit) * 1024)
+	} else {
+		t.RateOut.ResetLimit(int64(limit) * 1024)
+	}
+	t.RateIn.Start()
+	t.RateOut.Start()
 }
 
 func (t *Tunnel) CompileDestACL() {
@@ -304,7 +326,7 @@ func (t *Tunnel) AllowsDestination(addr string) bool {
 }
 
 func NewTunnelByHost(host *Host, port int) *Tunnel {
-	return &Tunnel{
+	t := &Tunnel{
 		ServerIp:     "0.0.0.0",
 		Port:         port,
 		Mode:         "tcp",
@@ -312,11 +334,14 @@ func NewTunnelByHost(host *Host, port int) *Tunnel {
 		RunStatus:    !host.IsClose,
 		Client:       host.Client,
 		Flow:         host.Flow,
+		RateLimit:    host.RateLimit,
 		NoStore:      true,
 		Target:       host.Target,
 		UserAuth:     host.UserAuth,
 		MultiAccount: host.MultiAccount,
 	}
+	t.SetRateLimit(t.RateLimit)
+	return t
 }
 
 func (s *Tunnel) Update(t *Tunnel) {
@@ -335,6 +360,13 @@ func (s *Tunnel) Update(t *Tunnel) {
 	s.ReadOnly = t.ReadOnly
 	s.Target = t.Target
 	s.MultiAccount = t.MultiAccount
+	s.RateLimit = t.RateLimit
+	if t.RateIn != nil {
+		s.RateIn = t.RateIn
+	}
+	if t.RateOut != nil {
+		s.RateOut = t.RateOut
+	}
 }
 
 func (s *Tunnel) AddConn() {
@@ -382,6 +414,9 @@ type Host struct {
 	AutoCORS         bool
 	CompatMode       bool
 	Flow             *Flow
+	RateLimit        int        // per-direction rate limit (KB/s), 0 means unlimited
+	RateIn           *rate.Rate `json:"-"`
+	RateOut          *rate.Rate `json:"-"`
 	NowConn          int32
 	Client           *Client
 	TargetIsHttps    bool
@@ -390,6 +425,25 @@ type Host struct {
 	MultiAccount     *MultiAccount
 	Health           `json:"-"`
 	sync.RWMutex
+}
+
+func (s *Host) SetRateLimit(limit int) {
+	if limit < 0 {
+		limit = 0
+	}
+	s.RateLimit = limit
+	if s.RateIn == nil {
+		s.RateIn = rate.NewRate(int64(limit) * 1024)
+	} else {
+		s.RateIn.ResetLimit(int64(limit) * 1024)
+	}
+	if s.RateOut == nil {
+		s.RateOut = rate.NewRate(int64(limit) * 1024)
+	} else {
+		s.RateOut.ResetLimit(int64(limit) * 1024)
+	}
+	s.RateIn.Start()
+	s.RateOut.Start()
 }
 
 func (s *Host) Update(h *Host) {
@@ -411,6 +465,13 @@ func (s *Host) Update(h *Host) {
 	s.TargetIsHttps = h.TargetIsHttps
 	s.Target = h.Target
 	s.MultiAccount = h.MultiAccount
+	s.RateLimit = h.RateLimit
+	if h.RateIn != nil {
+		s.RateIn = h.RateIn
+	}
+	if h.RateOut != nil {
+		s.RateOut = h.RateOut
+	}
 }
 
 func (s *Host) AddConn() {

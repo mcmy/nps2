@@ -18,6 +18,7 @@ import (
 	"github.com/mcmy/nps2/lib/file"
 	"github.com/mcmy/nps2/lib/goroutine"
 	"github.com/mcmy/nps2/lib/logs"
+	"github.com/mcmy/nps2/lib/rate"
 	"github.com/mcmy/nps2/server/proxy"
 )
 
@@ -280,6 +281,7 @@ func (s *HttpServer) handleWebsocket(w http.ResponseWriter, r *http.Request, hos
 		return
 	}
 	rawConn := conn.GetConn(targetConn, link.Crypt, link.Compress, host.Client.Rate, true, isLocal)
+	rawConn = rate.NewDirectionalRateConn(rawConn, host.RateIn, host.RateOut)
 	wsConn := conn.NewRWConn(rawConn)
 	var netConn net.Conn = wsConn
 
@@ -425,6 +427,7 @@ func (s *HttpServer) DialContext(ctx context.Context, network, addr string) (net
 		return nil, err
 	}
 	rawConn := conn.GetConn(target, link.Crypt, link.Compress, h.Client.Rate, true, isLocal)
+	rawConn = rate.NewDirectionalRateConn(rawConn, h.RateIn, h.RateOut)
 	flowConn := conn.NewFlowConn(rawConn, h.Flow, h.Client.Flow)
 	if h.Target.ProxyProtocol != 0 {
 		ra, _ := net.ResolveTCPAddr("tcp", remote)

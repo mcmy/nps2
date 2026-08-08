@@ -141,3 +141,51 @@ func TestTunnelAllowsDestination(t *testing.T) {
 		}
 	})
 }
+
+func TestTunnelSetRateLimitCreatesDirectionalLimiters(t *testing.T) {
+	tn := &Tunnel{}
+
+	tn.SetRateLimit(256)
+
+	if tn.RateLimit != 256 {
+		t.Fatalf("expected rate limit to be stored, got %d", tn.RateLimit)
+	}
+	if tn.RateIn == nil || tn.RateOut == nil {
+		t.Fatalf("expected both direction limiters to be initialized")
+	}
+	if tn.RateIn.Limit() != 256*1024 || tn.RateOut.Limit() != 256*1024 {
+		t.Fatalf("unexpected limiter values: in=%d out=%d", tn.RateIn.Limit(), tn.RateOut.Limit())
+	}
+}
+
+func TestHostSetRateLimitCreatesDirectionalLimiters(t *testing.T) {
+	h := &Host{}
+
+	h.SetRateLimit(128)
+
+	if h.RateLimit != 128 {
+		t.Fatalf("expected rate limit to be stored, got %d", h.RateLimit)
+	}
+	if h.RateIn == nil || h.RateOut == nil {
+		t.Fatalf("expected both direction limiters to be initialized")
+	}
+	if h.RateIn.Limit() != 128*1024 || h.RateOut.Limit() != 128*1024 {
+		t.Fatalf("unexpected limiter values: in=%d out=%d", h.RateIn.Limit(), h.RateOut.Limit())
+	}
+}
+
+func TestNewTunnelByHostInheritsRateLimit(t *testing.T) {
+	host := &Host{Client: &Client{}, RateLimit: 64}
+
+	task := NewTunnelByHost(host, 18080)
+
+	if task.RateLimit != 64 {
+		t.Fatalf("expected inherited rate limit, got %d", task.RateLimit)
+	}
+	if task.RateIn == nil || task.RateOut == nil {
+		t.Fatalf("expected inherited task limiters to be initialized")
+	}
+	if task.RateIn.Limit() != 64*1024 || task.RateOut.Limit() != 64*1024 {
+		t.Fatalf("unexpected inherited limiter values: in=%d out=%d", task.RateIn.Limit(), task.RateOut.Limit())
+	}
+}

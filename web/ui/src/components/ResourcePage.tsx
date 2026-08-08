@@ -442,7 +442,7 @@ function Field({ field, value, options }: { field: FieldSpec; value: any; option
     </label>;
   })}</div>{field.help && <small>{t(field.help)}</small>}</div>;
   return <div className={`field ${field.full ? 'full' : ''}`}><label htmlFor={common.id}>{t(field.label)}</label>
-    {field.type === 'textarea' ? <textarea {...common} rows={4} /> : field.type === 'select' ? <select {...common}>{field.name === 'client_id' && <option value="" disabled>{t('选择客户端')}</option>}{(options || field.options)?.map(option => <option value={option.value} key={option.value}>{t(option.label)}</option>)}</select> : <input {...common} type={field.type || 'text'} step={field.type === 'number' ? 1 : undefined} />}
+    {field.type === 'textarea' ? <textarea {...common} rows={4} /> : field.type === 'select' ? <select {...common}>{field.name === 'client_id' && <option value="" disabled>{t('选择客户端')}</option>}{(options || field.options)?.map(option => <option value={option.value} key={option.value}>{t(option.label)}</option>)}</select> : <input {...common} type={field.type || 'text'} step={field.type === 'number' ? (field.step ?? 1) : undefined} />}
     {field.help && <small>{t(field.help)}</small>}
   </div>;
 }

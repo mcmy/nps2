@@ -141,6 +141,7 @@ func (s *IndexController) AddHost() {
 				FlowLimit: int64(s.GetIntNoErr("flow_limit")),
 				TimeLimit: common.GetTimeNoErrByStr(s.getEscapeString("time_limit")),
 			},
+			RateLimit:      s.GetIntNoErr("rate_limit"),
 			Scheme:         s.getEscapeString("scheme"),
 			HttpsJustProxy: s.GetBoolNoErr("https_just_proxy"),
 			TlsOffload:     s.GetBoolNoErr("tls_offload"),
@@ -240,6 +241,7 @@ func (s *IndexController) EditHost() {
 			h.Target.LocalProxy = (clientId > 0 && s.GetBoolNoErr("local_proxy") && allowLocal) || clientId <= 0
 			h.Flow.FlowLimit = int64(s.GetIntNoErr("flow_limit"))
 			h.Flow.TimeLimit = common.GetTimeNoErrByStr(s.getEscapeString("time_limit"))
+			h.SetRateLimit(s.GetIntNoErr("rate_limit"))
 			if s.GetBoolNoErr("flow_reset") {
 				h.Flow.ExportFlow = 0
 				h.Flow.InletFlow = 0

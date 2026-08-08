@@ -16,6 +16,7 @@ export interface FieldSpec {
   uiOnly?: boolean;
   feature?: string;
   modes?: string[];
+  step?: number;
 }
 
 export interface ResourceSpec {
@@ -56,15 +57,24 @@ const aclOptions: SelectOption[] = [
 ];
 
 const flowLimitFields: FieldSpec[] = [
-  { name: 'flow_limit_total_bytes', label: '流量上限（字节）', type: 'number', tab: 'limits', feature: 'allow_flow_limit', help: '0 表示不限制' },
+  { name: 'flow_limit_mb', label: '流量上限（MB）', type: 'number', tab: 'limits', feature: 'allow_flow_limit', help: '按 MB 计，与文件大小对应；0 表示不限制' },
   { name: 'expire_at', label: '到期时间', type: 'datetime-local', tab: 'limits', feature: 'allow_time_limit' },
   { name: 'reset_flow', label: '保存时重置流量', type: 'checkbox', tab: 'limits' },
 ];
 
 const clientLimitFields: FieldSpec[] = [
   ...flowLimitFields,
-  { name: 'rate_limit_total_bps', label: '速率上限（bit/s）', type: 'number', tab: 'limits', feature: 'allow_rate_limit', help: '0 表示不限制' },
+  { name: 'rate_limit_mbps', label: '速率上限（Mbps）', type: 'number', step: 0.01, tab: 'limits', feature: 'allow_rate_limit', help: '支持小数；0 表示不限制（8 Mbps ≈ 1 MB/s）' },
   { name: 'max_connections', label: '最大连接数', type: 'number', tab: 'limits', feature: 'allow_connection_num_limit' },
+];
+
+// P2P 为点对点直连，流量不经过服务端，服务端限速对其不生效，故不在 P2P 模式下展示。
+const tunnelRateLimitFields: FieldSpec[] = [
+  { name: 'rate_limit_mbps', label: '隧道速率上限（Mbps）', type: 'number', step: 0.01, tab: 'limits', feature: 'allow_rate_limit', help: '上下行分别限制，支持小数；0 表示不限制（8 Mbps ≈ 1 MB/s）', modes: ['tcp', 'udp', 'mixProxy', 'secret', 'file'] },
+];
+
+const hostRateLimitFields: FieldSpec[] = [
+  { name: 'rate_limit_mbps', label: '隧道速率上限（Mbps）', type: 'number', step: 0.01, tab: 'limits', feature: 'allow_rate_limit', help: '上下行分别限制，支持小数；0 表示不限制（8 Mbps ≈ 1 MB/s）' },
 ];
 
 const clientAclFields: FieldSpec[] = [
@@ -118,6 +128,7 @@ export const resourceSpecs: Record<string, ResourceSpec> = {
       { name: 'local_path', label: '本地路径', tab: 'routing', modes: ['file'] }, { name: 'strip_pre', label: '移除路径前缀', tab: 'routing', modes: ['file'] },
       { name: 'enable_http', label: '启用 HTTP 代理', type: 'checkbox', tab: 'routing', modes: ['mixProxy'] }, { name: 'enable_socks5', label: '启用 Socks5 代理', type: 'checkbox', tab: 'routing', modes: ['mixProxy'] },
       ...flowLimitFields,
+      ...tunnelRateLimitFields,
       { name: 'dest_acl_mode', label: '目标访问控制', type: 'select', options: aclOptions, tab: 'security', modes: ['mixProxy'] },
       { name: 'dest_acl_rules', label: '目标规则', type: 'textarea', full: true, tab: 'security', modes: ['mixProxy'] },
       { name: 'auth', label: '代理认证', type: 'textarea', full: true, tab: 'security', modes: ['mixProxy'] },
@@ -148,6 +159,7 @@ export const resourceSpecs: Record<string, ResourceSpec> = {
       { name: 'auto_ssl', label: '自动申请证书', type: 'checkbox', tab: 'tls' }, { name: 'auto_https', label: '自动跳转 HTTPS', type: 'checkbox', tab: 'tls' },
       { name: 'cert_file', label: '证书内容或路径', type: 'textarea', full: true, tab: 'tls' }, { name: 'key_file', label: '私钥内容或路径', type: 'textarea', full: true, tab: 'tls' },
       ...flowLimitFields,
+      ...hostRateLimitFields,
       { name: 'proxy_protocol', label: 'Proxy Protocol', type: 'select', tab: 'security', options: [{ value: 0, label: '禁用' }, { value: 1, label: 'v1' }, { value: 2, label: 'v2' }] },
       { name: 'auth', label: 'Basic Auth', type: 'textarea', full: true, tab: 'security' },
     ],
@@ -172,9 +184,9 @@ export function valueFor(item: AnyRecord | null, field: FieldSpec) {
   if (field.name === 'web_password') return item.web_password || '';
   if (field.name === 'web_totp_secret') return item.web_totp_secret || '';
   if (field.name === 'blackiplist') return (item.blackiplist || item.black_ip_list || []).join('\n');
-  if (field.name === 'flow_limit_total_bytes' && flow) return Number(flow.flow_limit || 0) * 1024 * 1024;
+  if (field.name === 'flow_limit_mb' && flow) return Number(flow.flow_limit || 0);
   if (field.name === 'expire_at' && flow?.time_limit) return unixToLocal(flow.time_limit);
-  if (field.name === 'rate_limit_total_bps' && item.rate_limit !== undefined) return Number(item.rate_limit || 0) * 8 * 1024;
+  if (field.name === 'rate_limit_mbps' && item.rate_limit !== undefined) return Math.round(Number(item.rate_limit || 0) * 8192 / 1e6 * 100) / 100;
   if (field.name === 'max_connections' && item.max_conn !== undefined) return item.max_conn;
   if (field.name === 'max_tunnel_num' && item.max_tunnel !== undefined) return item.max_tunnel;
   if (field.name === 'status' && typeof item.status === 'number') return item.status === 1;

@@ -100,6 +100,7 @@ loop:
 			} else {
 				if hh.NoStore {
 					hh.Update(h)
+					hh.SetRateLimit(hh.RateLimit)
 					s.OpenHost <- hh
 				}
 			}
@@ -145,6 +146,7 @@ loop:
 					Socks5Proxy:  t.Socks5Proxy,
 					HttpProxy:    t.HttpProxy,
 					TargetType:   t.TargetType,
+					RateLimit:    t.RateLimit,
 					MultiAccount: t.MultiAccount,
 					Id:           int(file.GetDb().JsonDb.GetTaskId()),
 					Status:       true,
@@ -212,6 +214,7 @@ loop:
 				} else {
 					if tt.NoStore {
 						tt.Update(tl)
+						tt.SetRateLimit(tt.RateLimit)
 						s.OpenTask <- tt
 					}
 				}

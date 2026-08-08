@@ -173,6 +173,7 @@ server_ip=0.0.0.0
 mode=http
 target_addr=127.0.0.1:80,127.0.0.1:8080
 proxy_protocol=1
+rate_limit=512
 password=pwd
 socks5_proxy=true
 http_proxy=false
@@ -193,6 +194,9 @@ read_only=true`)
 	}
 	if tnl.DestAclMode != 2 || tnl.DestAclRules != "10.0.0.0/8\n192.168.0.0/16" {
 		t.Fatalf("dest acl parse failed: mode=%d rules=%q", tnl.DestAclMode, tnl.DestAclRules)
+	}
+	if tnl.RateLimit != 512 {
+		t.Fatalf("rate limit parse failed: %d", tnl.RateLimit)
 	}
 	if tnl.LocalPath != "/tmp" || tnl.StripPre != "/api" || !tnl.ReadOnly {
 		t.Fatalf("path/read-only parse failed: %+v", tnl)

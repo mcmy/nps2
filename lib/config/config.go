@@ -312,6 +312,8 @@ func dealTunnel(s string) *file.Tunnel {
 			t.TargetAddr = item[1]
 		case "password":
 			t.Password = item[1]
+		case "rate_limit":
+			t.RateLimit = common.GetIntNoErrByStr(item[1])
 		case "socks5_proxy":
 			t.Socks5Proxy = common.GetBoolByStr(item[1])
 		case "http_proxy":

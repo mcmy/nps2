@@ -166,14 +166,14 @@ function legacyForm(resource: string, body: AnyRecord) {
     clients: {
       verify_key: 'vkey', username: 'web_username', password: 'web_password',
       max_connections: 'max_conn', max_tunnel_num: 'max_tunnel',
-      flow_limit_total_bytes: 'flow_limit', rate_limit_total_bps: 'rate_limit',
+      flow_limit_mb: 'flow_limit', rate_limit_mbps: 'rate_limit',
       reset_flow: 'flow_reset', entry_acl_rules: 'blackiplist',
     },
     tunnels: {
-      mode: 'type', flow_limit_total_bytes: 'flow_limit', reset_flow: 'flow_reset',
+      mode: 'type', flow_limit_mb: 'flow_limit', rate_limit_mbps: 'rate_limit', reset_flow: 'flow_reset',
     },
     hosts: {
-      host_change: 'hostchange', flow_limit_total_bytes: 'flow_limit', reset_flow: 'flow_reset',
+      host_change: 'hostchange', flow_limit_mb: 'flow_limit', rate_limit_mbps: 'rate_limit', reset_flow: 'flow_reset',
     },
   };
   const form = new URLSearchParams();
@@ -183,8 +183,8 @@ function legacyForm(resource: string, body: AnyRecord) {
     let serialized: string;
     if (resource === 'clients' && key === 'config_username') serialized = String(value);
     else if (resource === 'clients' && key === 'config_password') serialized = String(value);
-    else if ((key === 'flow_limit_total_bytes') && Number(value) > 0) serialized = String(Math.ceil(Number(value) / (1024 * 1024)));
-    else if ((key === 'rate_limit_total_bps') && Number(value) > 0) serialized = String(Math.ceil(Number(value) / 8 / 1024));
+    else if ((key === 'flow_limit_mb') && Number(value) > 0) serialized = String(Math.round(Number(value)));
+    else if ((key === 'rate_limit_mbps') && Number(value) > 0) serialized = String(Math.max(1, Math.round(Number(value) * 1e6 / 8192)));
     else serialized = Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value);
     const legacyName = resource === 'clients' && key === 'config_username' ? 'u'
       : resource === 'clients' && key === 'config_password' ? 'p'

@@ -171,6 +171,7 @@ func (s *DbUtils) NewTask(t *Tunnel) (err error) {
 		t.TargetType = common.CONN_ALL
 	}
 	t.CompileDestACL()
+	t.SetRateLimit(t.RateLimit)
 	s.JsonDb.Tasks.Store(t.Id, t)
 	s.JsonDb.StoreTasksToJsonFile()
 	return
@@ -213,6 +214,13 @@ func (s *DbUtils) UpdateTask(t *Tunnel) error {
 		t.TargetType = common.CONN_ALL
 	}
 	t.CompileDestACL()
+	if old, ok := s.JsonDb.Tasks.Load(t.Id); ok {
+		if existing := old.(*Tunnel); existing.RateIn != nil && existing.RateOut != nil {
+			t.RateIn = existing.RateIn
+			t.RateOut = existing.RateOut
+		}
+	}
+	t.SetRateLimit(t.RateLimit)
 	s.JsonDb.Tasks.Store(t.Id, t)
 	s.JsonDb.StoreTasksToJsonFile()
 	return nil
@@ -228,6 +236,12 @@ func (s *DbUtils) DelTask(id int) error {
 	if v, ok := s.JsonDb.Tasks.Load(id); ok {
 		t := v.(*Tunnel)
 		TaskPasswordIndex.Remove(crypt.Md5(t.Password))
+		if t.RateIn != nil {
+			t.RateIn.Stop()
+		}
+		if t.RateOut != nil {
+			t.RateOut.Stop()
+		}
 	}
 	s.JsonDb.Tasks.Delete(id)
 	s.JsonDb.StoreTasksToJsonFile()
@@ -270,6 +284,12 @@ func (s *DbUtils) DelHost(id int) error {
 	if v, ok := s.JsonDb.Hosts.Load(id); ok {
 		h := v.(*Host)
 		HostIndex.Remove(h.Host, id)
+		if h.RateIn != nil {
+			h.RateIn.Stop()
+		}
+		if h.RateOut != nil {
+			h.RateOut.Stop()
+		}
 	}
 	s.JsonDb.Hosts.Delete(id)
 	s.JsonDb.StoreHostToJsonFile()
@@ -332,6 +352,7 @@ func (s *DbUtils) NewHost(t *Host) error {
 	t.CertType = common.GetCertType(t.CertFile)
 	t.CertHash = crypt.FNV1a64(t.CertType, t.CertFile, t.KeyFile)
 	t.Flow = new(Flow)
+	t.SetRateLimit(t.RateLimit)
 	s.JsonDb.Hosts.Store(t.Id, t)
 	s.JsonDb.StoreHostToJsonFile()
 	return nil

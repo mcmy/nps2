@@ -69,6 +69,7 @@ func (s *JsonDb) LoadTaskFromJsonFile() {
 			post.TargetType = common.CONN_ALL
 		}
 		post.CompileDestACL()
+		post.SetRateLimit(post.RateLimit)
 		s.Tasks.Store(post.Id, post)
 		if post.Id > int(s.TaskIncreaseId) {
 			s.TaskIncreaseId = int32(post.Id)
@@ -112,6 +113,7 @@ func (s *JsonDb) LoadHostFromJsonFile() {
 			post.CertHash = crypt.FNV1a64(post.CertType, post.CertFile, post.KeyFile)
 		}
 		post.NowConn = 0
+		post.SetRateLimit(post.RateLimit)
 		s.Hosts.Store(post.Id, post)
 		HostIndex.Add(post.Host, post.Id)
 		if post.Id > int(s.HostIncreaseId) {

@@ -11,32 +11,39 @@ import (
 	"github.com/mcmy/nps2/lib/common"
 	"github.com/mcmy/nps2/lib/file"
 	"github.com/mcmy/nps2/lib/logs"
+	"github.com/mcmy/nps2/lib/rate"
 	"github.com/panjf2000/ants/v2"
 )
 
 type connGroup struct {
-	src    io.ReadWriteCloser
-	dst    io.ReadWriteCloser
-	wg     *sync.WaitGroup
-	n      *int64
-	flows  []*file.Flow
-	task   *file.Tunnel
-	remote string
+	src     io.ReadWriteCloser
+	dst     io.ReadWriteCloser
+	wg      *sync.WaitGroup
+	n       *int64
+	flows   []*file.Flow
+	task    *file.Tunnel
+	limiter *rate.Rate
+	remote  string
 }
 
-func newConnGroup(dst, src io.ReadWriteCloser, wg *sync.WaitGroup, n *int64, flows []*file.Flow, task *file.Tunnel, remote string) connGroup {
+func newConnGroup(dst, src io.ReadWriteCloser, wg *sync.WaitGroup, n *int64, flows []*file.Flow, task *file.Tunnel, limiter *rate.Rate, remote string) connGroup {
 	return connGroup{
-		src:    src,
-		dst:    dst,
-		wg:     wg,
-		n:      n,
-		flows:  flows,
-		task:   task,
-		remote: remote,
+		src:     src,
+		dst:     dst,
+		wg:      wg,
+		n:       n,
+		flows:   flows,
+		task:    task,
+		limiter: limiter,
+		remote:  remote,
 	}
 }
 
 func CopyBuffer(dst io.Writer, src io.Reader, flows []*file.Flow, task *file.Tunnel, remote string) (written int64, err error) {
+	return CopyBufferWithRate(dst, src, flows, task, nil, remote)
+}
+
+func CopyBufferWithRate(dst io.Writer, src io.Reader, flows []*file.Flow, task *file.Tunnel, limiter *rate.Rate, remote string) (written int64, err error) {
 	buf := common.BufPoolCopy.Get()
 	defer common.BufPoolCopy.Put(buf)
 
@@ -69,7 +76,13 @@ func CopyBuffer(dst io.Writer, src io.Reader, flows []*file.Flow, task *file.Tun
 		}
 
 		if er == nil || nr > 0 {
+			if limiter != nil && nr > 0 {
+				limiter.Get(int64(nr))
+			}
 			nw, ew := dst.Write(buf[:nr])
+			if limiter != nil && nr > 0 && nw < nr {
+				limiter.ReturnBucket(int64(nr - nw))
+			}
 			if nw > 0 {
 				written += int64(nw)
 				if len(flows) > 0 {
@@ -121,7 +134,7 @@ func copyConnGroup(group interface{}) {
 		_ = cg.dst.Close()
 	}()
 
-	*cg.n, _ = CopyBuffer(cg.dst, cg.src, cg.flows, cg.task, cg.remote)
+	*cg.n, _ = CopyBufferWithRate(cg.dst, cg.src, cg.flows, cg.task, cg.limiter, cg.remote)
 }
 
 type Conns struct {
@@ -153,8 +166,13 @@ func copyConns(group interface{}) {
 		remoteAddr = ra.String()
 	}
 
-	_ = connCopyPool.Invoke(newConnGroup(conns.conn1, conns.conn2, wg, &in, conns.flows, conns.task, remoteAddr))
-	_ = connCopyPool.Invoke(newConnGroup(conns.conn2, conns.conn1, wg, &out, conns.flows, conns.task, remoteAddr))
+	var inRate, outRate *rate.Rate
+	if conns.task != nil {
+		inRate = conns.task.RateIn
+		outRate = conns.task.RateOut
+	}
+	_ = connCopyPool.Invoke(newConnGroup(conns.conn1, conns.conn2, wg, &in, conns.flows, conns.task, inRate, remoteAddr))
+	_ = connCopyPool.Invoke(newConnGroup(conns.conn2, conns.conn1, wg, &out, conns.flows, conns.task, outRate, remoteAddr))
 
 	wg.Wait()
 	if conns.task != nil && conns.task.Flow != nil {
@@ -182,6 +200,9 @@ func Join(c1, c2 net.Conn, flows []*file.Flow, task *file.Tunnel, remote string)
 	go func() {
 		defer wg.Done()
 		defer closeBoth()
+		// No rate limiting here: the only caller (websocket proxy) already wraps
+		// the backend conn with rate.NewDirectionalRateConn(host.RateIn/RateOut).
+		// Charging task.RateIn/RateOut again would double-limit the same bytes.
 		_, _ = CopyBuffer(c1, c2, flows, task, remote)
 	}()
 

@@ -16,6 +16,7 @@ import (
 	"github.com/mcmy/nps2/lib/conn"
 	"github.com/mcmy/nps2/lib/file"
 	"github.com/mcmy/nps2/lib/logs"
+	"github.com/mcmy/nps2/lib/rate"
 )
 
 type TunnelModeServer struct {
@@ -164,6 +165,7 @@ func ProcessHttp(c *conn.Conn, s *TunnelModeServer) error {
 				return nil, err
 			}
 			rawConn := conn.GetConn(target, link.Crypt, link.Compress, s.Task.Client.Rate, true, isLocal)
+			rawConn = rate.NewDirectionalRateConn(rawConn, s.Task.RateIn, s.Task.RateOut)
 			return conn.NewFlowConn(rawConn, s.Task.Flow, s.Task.Client.Flow), nil
 		},
 	}

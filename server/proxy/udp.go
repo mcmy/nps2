@@ -11,6 +11,7 @@ import (
 	"github.com/mcmy/nps2/lib/conn"
 	"github.com/mcmy/nps2/lib/file"
 	"github.com/mcmy/nps2/lib/logs"
+	"github.com/mcmy/nps2/lib/rate"
 )
 
 type packet struct {
@@ -136,6 +137,7 @@ func (s *UdpModeServer) clientWorker(addr *net.UDPAddr, ent *entry) {
 		return
 	}
 	target := conn.GetConn(clientConn, s.Task.Client.Cnf.Crypt, s.Task.Client.Cnf.Compress, s.Task.Client.Rate, true, isLocal)
+	target = rate.NewDirectionalRateConn(target, s.Task.RateIn, s.Task.RateOut)
 	flowConn := conn.NewFlowConn(target, s.Task.Flow, s.Task.Client.Flow)
 	if isLocal && s.Bridge.IsServer() {
 		ent.conn = flowConn
