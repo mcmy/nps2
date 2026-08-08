@@ -1,0 +1,11 @@
+.git
+.github
+.idea
+
+*.spk
+*.tar.gz
+coverage.txt
+dist
+npc.exe
+nps.exe
+web/ui/node_modules

@@ -59,24 +59,22 @@ NPS 是一款轻量高效的内网穿透代理服务器，支持多种协议（T
 
 ### Docker 部署
 
-***DockerHub***： [NPS](https://hub.docker.com/r/duan2001/nps) [NPC](https://hub.docker.com/r/duan2001/npc)
-
 ***GHCR***： [NPS](https://github.com/mcmy/nps2/pkgs/container/nps) [NPC](https://github.com/mcmy/nps2/pkgs/container/npc)
 
 > 有真实IP获取需求可配合 [mmproxy](https://github.com/djylb/mmproxy-docker) 使用。例如：SSH
 
 #### NPS 服务端
 ```bash
-docker pull duan2001/nps
-docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /etc/localtime:/etc/localtime:ro duan2001/nps
+docker pull ghcr.io/mcmy/nps
+docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /etc/localtime:/etc/localtime:ro ghcr.io/mcmy/nps
 ```
 
 > **提示：** NPS 安装完成后，请先修改 `nps.conf`（如监听端口、Web 管理账号等）再启动服务。
 
 #### NPC 客户端
 ```bash
-docker pull duan2001/npc
-docker run -d --restart=always --name npc --net=host duan2001/npc -server=xxx:123,yyy:456 -vkey=key1,key2 -type=tls,tcp -log=off
+docker pull ghcr.io/mcmy/npc
+docker run -d --restart=always --name npc --net=host ghcr.io/mcmy/npc -server=xxx:123,yyy:456 -vkey=key1,key2 -type=tls,tcp -log=off
 ```
 
 > **提示：** `-server`、`-vkey`、`-type` 等参数请从 NPS Web 管理端的客户端页面复制，避免手动填写错误。

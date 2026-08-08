@@ -59,8 +59,6 @@ For more detailed configuration options, please refer to the [Documentation](htt
 
 ### Docker Deployment
 
-**DockerHub:** [NPS](https://hub.docker.com/r/duan2001/nps) | [NPC](https://hub.docker.com/r/duan2001/npc)
-
 **GHCR:** [NPS](https://github.com/mcmy/nps2/pkgs/container/nps) | [NPC](https://github.com/mcmy/nps2/pkgs/container/npc)
 
 > If you need to obtain the real client IP, you can use it together with [mmproxy](https://github.com/djylb/mmproxy-docker). For example: SSH.
@@ -68,8 +66,8 @@ For more detailed configuration options, please refer to the [Documentation](htt
 #### NPS Server
 
 ```bash
-docker pull duan2001/nps
-docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /etc/localtime:/etc/localtime:ro duan2001/nps
+docker pull ghcr.io/mcmy/nps
+docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /etc/localtime:/etc/localtime:ro ghcr.io/mcmy/nps
 ```
 
 > **Tip:** After installing NPS, edit `nps.conf` (for example: listening ports and Web admin credentials) before starting the service.
@@ -77,8 +75,8 @@ docker run -d --restart=always --name nps --net=host -v $(pwd)/conf:/conf -v /et
 #### NPC Client
 
 ```bash
-docker pull duan2001/npc
-docker run -d --restart=always --name npc --net=host duan2001/npc -server=xxx:123,yyy:456 -vkey=key1,key2 -type=tls,tcp -log=off
+docker pull ghcr.io/mcmy/npc
+docker run -d --restart=always --name npc --net=host ghcr.io/mcmy/npc -server=xxx:123,yyy:456 -vkey=key1,key2 -type=tls,tcp -log=off
 ```
 
 > **Tip:** Get `-server`, `-vkey`, and `-type` from the client page in the NPS Web UI to avoid manual input mistakes.

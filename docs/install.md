@@ -6,17 +6,12 @@ NPS 提供多种安装方式，推荐使用 **Docker 部署**，也支持 **二�
 
 ## 1. Docker 安装（推荐）
 
-提供 Docker 镜像，支持 **DockerHub** 和 **GitHub Container Registry (GHCR)** 。
+Docker 镜像发布在 **GitHub Container Registry (GHCR)**。
 
 ### **1.1 NPS 服务器端**
 
-#### **DockerHub（推荐）**
-```bash
-docker pull duan2001/nps
-docker run -d --restart=always --name nps --net=host -v <local_conf_dir>:/conf -v /etc/localtime:/etc/localtime:ro duan2001/nps
-```
+#### **GHCR**
 
-#### **GHCR（可选）**
 ```bash
 docker pull ghcr.io/mcmy/nps
 docker run -d --restart=always --name nps --net=host -v <local_conf_dir>:/conf -v /etc/localtime:/etc/localtime:ro ghcr.io/mcmy/nps
@@ -26,13 +21,7 @@ docker run -d --restart=always --name nps --net=host -v <local_conf_dir>:/conf -
 
 ### **1.2 NPC 客户端**
 
-#### **DockerHub（推荐）**
-```bash
-docker pull duan2001/npc
-docker run -d --restart=always --name npc --net=host duan2001/npc -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls,tcp -log=off
-```
-
-#### **GHCR（可选）**
+#### **GHCR**
 ```bash
 docker pull ghcr.io/mcmy/npc
 docker run -d --restart=always --name npc --net=host ghcr.io/mcmy/npc -server=xxx:123,yyy:456 -vkey=xxx,yyy -type=tls,tcp -log=off
@@ -268,9 +257,6 @@ go build -o npc cmd/npc/npc.go
 - **最新发布版本**：[GitHub Releases](https://github.com/mcmy/nps2/releases/latest)
 - **Android**：[djylb/npsclient](https://github.com/djylb/npsclient)
 - **OpenWrt**：[djylb/nps-openwrt](https://github.com/djylb/nps-openwrt)
-- **DockerHub 镜像**
-  - [NPS Server](https://hub.docker.com/r/duan2001/nps)
-  - [NPC Client](https://hub.docker.com/r/duan2001/npc)
 - **GHCR 镜像**
   - [NPS Server](https://github.com/mcmy/nps2/pkgs/container/nps)
   - [NPC Client](https://github.com/mcmy/nps2/pkgs/container/npc)

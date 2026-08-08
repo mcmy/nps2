@@ -161,9 +161,9 @@ docker exec -it spksrc /bin/bash -c 'cd /spksrc && make setup && cd /spksrc/spk/
 cp ~/spksrc/packages/npc_x64-7.0_$VERSION-1.spk ./npc_syno.spk
 
 
-echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 export DOCKER_CLI_EXPERIMENTAL=enabled
 docker run --rm --privileged docker/binfmt:66f9012c56a8316f9244ffd7622d7c21c1f6f28d
 docker buildx create --use --name mybuilder
-docker buildx build --tag duan2001/nps:$VERSION --tag duan2001/nps:latest --output type=image,push=true --file Dockerfile.nps --platform=linux/amd64,linux/arm64,linux/386,linux/arm .
-docker buildx build --tag duan2001/npc:$VERSION --tag duan2001/npc:latest --output type=image,push=true --file Dockerfile.npc --platform=linux/amd64,linux/arm64,linux/386,linux/arm .
+docker buildx build --tag ghcr.io/mcmy/nps:$VERSION --tag ghcr.io/mcmy/nps:latest --output type=image,push=true --file Dockerfile.nps --platform=linux/amd64,linux/arm64,linux/386,linux/arm .
+docker buildx build --tag ghcr.io/mcmy/npc:$VERSION --tag ghcr.io/mcmy/npc:latest --output type=image,push=true --file Dockerfile.npc --platform=linux/amd64,linux/arm64,linux/386,linux/arm .

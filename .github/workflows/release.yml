@@ -179,9 +179,81 @@ jobs:
           path: dist/release/*.tar.gz
           if-no-files-found: error
 
+  push-dockerhub:
+    name: Push ${{ matrix.image }} to Docker Hub
+    needs: build-docker
+    runs-on: ubuntu-latest
+    environment: docker
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      fail-fast: true
+      matrix:
+        image: [nps, npc]
+    steps:
+      - name: Resolve image tag
+        id: image-tag
+        shell: bash
+        run: |
+          ref="$GITHUB_REF_NAME"
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$ref" == v* ]]; then
+            image_tag="${ref//\//-}"
+            channel="stable"
+          elif [[ "$GITHUB_REF_TYPE" == "branch" && "$ref" == dev/v* ]]; then
+            image_tag="dev"
+            channel="dev"
+          else
+            echo "Unsupported ref: $GITHUB_REF" >&2
+            exit 1
+          fi
+
+          echo "image_tag=$image_tag" >> "$GITHUB_OUTPUT"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Copy image manifest to Docker Hub
+        shell: bash
+        env:
+          IMAGE_TAG: ${{ steps.image-tag.outputs.image_tag }}
+          CHANNEL: ${{ steps.image-tag.outputs.channel }}
+          IMAGE_NAME: ${{ matrix.image }}
+          DOCKERHUB_NAMESPACE: ${{ vars.DOCKERHUB_NAMESPACE }}
+          GHCR_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+
+          source_image="ghcr.io/${GHCR_OWNER,,}/${IMAGE_NAME}:${IMAGE_TAG}"
+          target_image="docker.io/${DOCKERHUB_NAMESPACE,,}/${IMAGE_NAME}:${IMAGE_TAG}"
+
+          docker buildx imagetools create \
+            --tag "$target_image" \
+            "$source_image"
+
+          if [[ "$CHANNEL" == "stable" ]]; then
+            docker buildx imagetools create \
+              --tag "docker.io/${DOCKERHUB_NAMESPACE,,}/${IMAGE_NAME}:latest" \
+              "ghcr.io/${GHCR_OWNER,,}/${IMAGE_NAME}:latest"
+          fi
+
   publish-release:
     name: Publish GitHub Release
-    needs: [build-release, build-docker]
+    needs: [build-release, build-docker, push-dockerhub]
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
