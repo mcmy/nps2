@@ -2,6 +2,7 @@ package server
 
 import (
 	"math"
+	"net"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -17,7 +18,7 @@ import (
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
-	"github.com/shirou/gopsutil/v4/net"
+	psnet "github.com/shirou/gopsutil/v4/net"
 )
 
 var (
@@ -38,7 +39,7 @@ var (
 
 func startSpeedSampler() {
 	samplerOnce.Do(func() {
-		if io1, _ := net.IOCounters(false); len(io1) > 0 {
+		if io1, _ := psnet.IOCounters(false); len(io1) > 0 {
 			lastBytesSent = io1[0].BytesSent
 			lastBytesRecv = io1[0].BytesRecv
 		}
@@ -48,7 +49,7 @@ func startSpeedSampler() {
 			ticker := time.NewTicker(time.Second)
 			defer ticker.Stop()
 			for now := range ticker.C {
-				if io2, _ := net.IOCounters(false); len(io2) > 0 {
+				if io2, _ := psnet.IOCounters(false); len(io2) > 0 {
 					sent := io2[0].BytesSent
 					recv := io2[0].BytesRecv
 					elapsed := now.Sub(lastSampleTime).Seconds()
@@ -120,7 +121,7 @@ func GetDashboardData(force bool) map[string]interface{} {
 		}
 
 		protoVals := map[string]int64{}
-		if pcounters, err := net.ProtoCounters(nil); err == nil {
+		if pcounters, err := psnet.ProtoCounters(nil); err == nil {
 			for _, v := range pcounters {
 				if val, ok := v.Stats["CurrEstab"]; ok {
 					protoVals[v.Protocol] = val
@@ -128,12 +129,12 @@ func GetDashboardData(force bool) map[string]interface{} {
 			}
 		}
 		if _, ok := protoVals["tcp"]; !ok {
-			if conns, err := net.Connections("tcp"); err == nil {
+			if conns, err := psnet.Connections("tcp"); err == nil {
 				protoVals["tcp"] = int64(len(conns))
 			}
 		}
 		if _, ok := protoVals["udp"]; !ok {
-			if conns, err := net.Connections("udp"); err == nil {
+			if conns, err := psnet.Connections("udp"); err == nil {
 				protoVals["udp"] = int64(len(conns))
 			}
 		}
@@ -296,7 +297,7 @@ func GetDashboardData(force bool) map[string]interface{} {
 	if vir, err := mem.VirtualMemory(); err == nil {
 		data["virtual_mem"] = math.Round(vir.UsedPercent)
 	}
-	if pcounters, err := net.ProtoCounters(nil); err == nil {
+	if pcounters, err := psnet.ProtoCounters(nil); err == nil {
 		for _, v := range pcounters {
 			if val, ok := v.Stats["CurrEstab"]; ok {
 				data[v.Protocol] = val
@@ -304,12 +305,12 @@ func GetDashboardData(force bool) map[string]interface{} {
 		}
 	}
 	if _, ok := data["tcp"]; !ok {
-		if conns, err := net.Connections("tcp"); err == nil {
+		if conns, err := psnet.Connections("tcp"); err == nil {
 			data["tcp"] = int64(len(conns))
 		}
 	}
 	if _, ok := data["udp"]; !ok {
-		if conns, err := net.Connections("udp"); err == nil {
+		if conns, err := psnet.Connections("udp"); err == nil {
 			data["udp"] = int64(len(conns))
 		}
 	}
@@ -319,6 +320,111 @@ func GetDashboardData(force bool) map[string]interface{} {
 	}
 	if v, ok := ioRecvRate.Load().(float64); ok {
 		data["io_recv"] = v
+	}
+
+	serverHost := common.GetServerIp(connection.P2pIp)
+	bridgeHost := common.GetIpByAddr(beego.AppConfig.DefaultString("bridge_addr", serverHost))
+	if bridgeHost == "" {
+		bridgeHost = serverHost
+	}
+	buildEndpoint := func(enabled bool, bridgeType, host string, port int, path string, alpn string) map[string]interface{} {
+		active := enabled && port > 0 && host != ""
+		addr := ""
+		if active {
+			addr = net.JoinHostPort(host, strconv.Itoa(port))
+			if path != "" {
+				addr += path
+			}
+			if alpn != "" && alpn != "nps" {
+				addr += "/" + alpn
+			}
+		}
+		return map[string]interface{}{
+			"enabled": active,
+			"type":    bridgeType,
+			"ip":      host,
+			"port":    port,
+			"addr":    addr,
+			"path":    path,
+			"alpn":    alpn,
+		}
+	}
+	primaryType := beego.AppConfig.String("bridge_type")
+	if primaryType == "both" {
+		primaryType = "tcp"
+	}
+	primary := buildEndpoint(false, primaryType, bridgeHost, connection.BridgePort, "", "")
+	switch {
+	case beego.AppConfig.DefaultBool("bridge_tls_show", bridge.ServerTlsEnable):
+		primaryType = "tls"
+		primary = buildEndpoint(true, primaryType,
+			beego.AppConfig.DefaultString("bridge_tls_show_ip", bridgeHost),
+			connection.BridgeTlsPort,
+			"",
+			"",
+		)
+	case beego.AppConfig.DefaultBool("bridge_quic_show", bridge.ServerQuicEnable):
+		primaryType = "quic"
+		primary = buildEndpoint(true, primaryType,
+			beego.AppConfig.DefaultString("bridge_quic_show_ip", bridgeHost),
+			connection.BridgeQuicPort,
+			"",
+			beego.AppConfig.DefaultString("bridge_quic_show_alpn", connection.QuicAlpn[0]),
+		)
+	case beego.AppConfig.DefaultBool("bridge_wss_show", bridge.ServerWssEnable):
+		primaryType = "wss"
+		primary = buildEndpoint(true, primaryType,
+			beego.AppConfig.DefaultString("bridge_wss_show_ip", bridgeHost),
+			connection.BridgeWssPort,
+			beego.AppConfig.DefaultString("bridge_show_path", connection.BridgePath),
+			"",
+		)
+	case beego.AppConfig.DefaultBool("bridge_tcp_show", bridge.ServerTcpEnable):
+		primaryType = "tcp"
+		primary = buildEndpoint(true, primaryType,
+			beego.AppConfig.DefaultString("bridge_tcp_show_ip", bridgeHost),
+			connection.BridgeTcpPort,
+			"",
+			"",
+		)
+	case beego.AppConfig.DefaultBool("bridge_kcp_show", bridge.ServerKcpEnable):
+		primaryType = "kcp"
+		primary = buildEndpoint(true, primaryType,
+			beego.AppConfig.DefaultString("bridge_kcp_show_ip", bridgeHost),
+			connection.BridgeKcpPort,
+			"",
+			"",
+		)
+	case beego.AppConfig.DefaultBool("bridge_ws_show", bridge.ServerWsEnable):
+		primaryType = "ws"
+		primary = buildEndpoint(true, primaryType,
+			beego.AppConfig.DefaultString("bridge_ws_show_ip", bridgeHost),
+			connection.BridgeWsPort,
+			beego.AppConfig.DefaultString("bridge_show_path", connection.BridgePath),
+			"",
+		)
+	}
+	data["display"] = map[string]interface{}{
+		"bridge": map[string]interface{}{
+			"primary": primary,
+			"tcp": buildEndpoint(beego.AppConfig.DefaultBool("bridge_tcp_show", bridge.ServerTcpEnable), "tcp",
+				beego.AppConfig.DefaultString("bridge_tcp_show_ip", bridgeHost), connection.BridgeTcpPort, "", ""),
+			"kcp": buildEndpoint(beego.AppConfig.DefaultBool("bridge_kcp_show", bridge.ServerKcpEnable), "kcp",
+				beego.AppConfig.DefaultString("bridge_kcp_show_ip", bridgeHost), connection.BridgeKcpPort, "", ""),
+			"tls": buildEndpoint(beego.AppConfig.DefaultBool("bridge_tls_show", bridge.ServerTlsEnable), "tls",
+				beego.AppConfig.DefaultString("bridge_tls_show_ip", bridgeHost), connection.BridgeTlsPort, "", ""),
+			"quic": buildEndpoint(beego.AppConfig.DefaultBool("bridge_quic_show", bridge.ServerQuicEnable), "quic",
+				beego.AppConfig.DefaultString("bridge_quic_show_ip", bridgeHost), connection.BridgeQuicPort, "",
+				beego.AppConfig.DefaultString("bridge_quic_show_alpn", connection.QuicAlpn[0])),
+			"ws": buildEndpoint(beego.AppConfig.DefaultBool("bridge_ws_show", bridge.ServerWsEnable), "ws",
+				beego.AppConfig.DefaultString("bridge_ws_show_ip", bridgeHost), connection.BridgeWsPort,
+				beego.AppConfig.DefaultString("bridge_show_path", connection.BridgePath), ""),
+			"wss": buildEndpoint(beego.AppConfig.DefaultBool("bridge_wss_show", bridge.ServerWssEnable), "wss",
+				beego.AppConfig.DefaultString("bridge_wss_show_ip", bridgeHost), connection.BridgeWssPort,
+				beego.AppConfig.DefaultString("bridge_show_path", connection.BridgePath), ""),
+		},
+		"http_proxy_port":  beego.AppConfig.String("http_proxy_port"),
+		"https_proxy_port": beego.AppConfig.String("https_proxy_port"),
 	}
 
 	// chart

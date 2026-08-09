@@ -1,4 +1,4 @@
-import { Activity, ArrowDown, ArrowUp, Ban, Copy, Edit3, Eye, Filter, Globe2 as GlobeIcon, MoreHorizontal, Network as NetworkIcon, Play, Plus, QrCode, RadioTower, RefreshCw, RotateCcw, Search, Square, Trash2, Unplug, X } from 'lucide-react';
+import { Activity, ArrowDown, ArrowUp, Ban, ChevronDown, Copy, Edit3, Eye, Filter, Globe2 as GlobeIcon, MoreHorizontal, Network as NetworkIcon, Play, Plus, QrCode, RadioTower, RefreshCw, RotateCcw, Search, Square, Trash2, Unplug, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { actionRequest, materialize, normalizeLegacyKeys, request, requestBlob } from '../lib/api';
 import { formBody, tunnelModeDetails, tunnelModeOptions, valueFor, type FieldSpec, type ResourceSpec, type SelectOption } from '../lib/forms';
@@ -275,7 +275,7 @@ function ResourceDetailsDrawer({ discovery, actions, spec, item, notify, onMutat
     finally { setBusy(false); }
   }
   return <Drawer title={t('配置详情')} subtitle={`${t(spec.title)} #${current.id} · ${t('修订')} ${current.revision || 0}`} onClose={onClose} footer={<><button className="btn" onClick={onClose}>{t('关闭')}</button>{onClone && <button className="btn primary" onClick={() => onClone(current)}><Copy />{t('复制为新资源')}</button>}</>}>
-    <div className="detail-sections">{controls.length > 0 && <section className="detail-section"><h3>{t('快捷控制')}</h3><div className="control-list">{controls.map(control => <button className="control-item" type="button" disabled={busy} key={control.mode} onClick={() => void runControl(control)}><span>{t(control.label)}</span>{control.kind === 'toggle' && <small className={`badge ${control.enabled ? 'ok' : 'off'}`}>{t(control.enabled ? '已启用' : '已停用')}</small>}{control.kind === 'clear' ? <RotateCcw /> : control.enabled ? <Square /> : <Play />}</button>)}</div></section>}{commands.length > 0 && <section className="detail-section"><h3>{t('连接命令')}</h3><div className="command-list">{commands.map(command => <div key={command.label}><span>{command.label}</span><code>{command.value}</code><button className="icon-btn" type="button" title={t('复制')} aria-label={t('复制')} onClick={() => void copyValue(command.value, t, notify)}><Copy /></button></div>)}</div></section>}{runtimeFields(spec.resource, current).length > 0 && <section className="detail-section"><h3>{t('运行状态')}</h3><dl className="detail-grid">{runtimeFields(spec.resource, current).map(field => <DetailValue key={field.name} label={t(field.label)} value={field.value} t={t} notify={notify} />)}</dl></section>}{spec.tabs.map(tab => {
+    <div className="detail-sections">{controls.length > 0 && <section className="detail-section"><h3>{t('快捷控制')}</h3><div className="control-list">{controls.map(control => <button className="control-item" type="button" disabled={busy} key={control.mode} onClick={() => void runControl(control)}><span>{t(control.label)}</span>{control.kind === 'toggle' && <small className={`badge ${control.enabled ? 'ok' : 'off'}`}>{t(control.enabled ? '已启用' : '已停用')}</small>}{control.kind === 'clear' ? <RotateCcw /> : control.enabled ? <Square /> : <Play />}</button>)}</div></section>}{commands.length > 0 && <section className="detail-section"><h3>{t('连接命令')}</h3><div className="command-list">{commands.map(command => <details className="command-item" key={command.key}><summary><span className="command-label">{command.label}</span><code>{command.address || '-'}</code><ChevronDown className="command-toggle" size={14} /></summary><div className="command-body"><code>{command.value}</code><button className="icon-btn" type="button" title={t('复制')} aria-label={t('复制')} onClick={() => void copyValue(command.value, t, notify)}><Copy /></button></div></details>)}</div></section>}{runtimeFields(spec.resource, current).length > 0 && <section className="detail-section"><h3>{t('运行状态')}</h3><dl className="detail-grid">{runtimeFields(spec.resource, current).map(field => <DetailValue key={field.name} label={t(field.label)} value={field.value} t={t} notify={notify} />)}</dl></section>}{spec.tabs.map(tab => {
       const tabFields = fields.filter(field => (field.tab || 'basic') === tab.key);
       if (!tabFields.length) return null;
       return <section className="detail-section" key={tab.key}><h3>{t(tab.label)}</h3><dl className="detail-grid">{tabFields.map(field => <DetailValue key={field.name} label={t(field.label)} value={valueFor(current, field)} present={fieldReturned(current, field)} t={t} notify={notify} />)}</dl></section>;
@@ -310,17 +310,18 @@ function resourceControls(resource: string, item: AnyRecord): ResourceControl[] 
   return controls;
 }
 
-function connectionCommands(resource: string, item: AnyRecord, client: AnyRecord | null, runtime: AnyRecord) {
+type ConnectionCommand = { key: string; label: string; address: string; value: string };
+
+function connectionCommands(resource: string, item: AnyRecord, client: AnyRecord | null, runtime: AnyRecord): ConnectionCommand[] {
   const bridge = runtime.display?.bridge || {};
   const verifyKey = resource === 'clients' ? item.verify_key : client?.verify_key;
-  if (!verifyKey) return [] as Array<{ label: string; value: string }>;
+  if (!verifyKey) return [] as ConnectionCommand[];
   if (resource === 'clients') {
     return ['tcp', 'kcp', 'tls', 'quic', 'ws', 'wss'].flatMap(type => {
       const transport = bridge[type];
       if (!transport?.enabled) return [];
-      let address = transport.addr || [transport.ip, transport.port].filter(Boolean).join(':');
-      if ((type === 'ws' || type === 'wss') && bridge.path && !address.endsWith(bridge.path)) address += bridge.path;
-      return address ? [{ label: type.toUpperCase(), value: `./npc -server="${address}" -vkey="${verifyKey}" -type="${type}"` }] : [];
+      const address = transport.addr || [transport.ip, transport.port].filter(Boolean).join(':');
+      return address ? [{ key: type, label: type.toUpperCase(), address, value: `./npc -server="${address}" -vkey="${verifyKey}" -type="${type}"` }] : [];
     });
   }
   if (resource === 'tunnels' && (item.mode === 'secret' || item.mode === 'p2p')) {
@@ -328,8 +329,8 @@ function connectionCommands(resource: string, item: AnyRecord, client: AnyRecord
     const address = primary.addr || [primary.ip, primary.port].filter(Boolean).join(':');
     const type = primary.type || 'tcp';
     if (!address) return [];
-    if (item.mode === 'secret') return [{ label: 'Secret', value: `./npc -server="${address}" -vkey="${verifyKey}" -type="${type}" -password="${item.password || ''}" -target_type="${item.target_type || 'all'}" -local_type="secret"` }];
-    return [{ label: 'P2P', value: `./npc -server="${address}" -vkey="${verifyKey}" -type="${type}" -password="${item.password || ''}" -target="${item.target || ''}" -target_type="${item.target_type || 'all'}"` }];
+    if (item.mode === 'secret') return [{ key: 'secret', label: 'Secret', address, value: `./npc -server="${address}" -vkey="${verifyKey}" -type="${type}" -password="${item.password || ''}" -target_type="${item.target_type || 'all'}" -local_type="secret"` }];
+    return [{ key: 'p2p', label: 'P2P', address, value: `./npc -server="${address}" -vkey="${verifyKey}" -type="${type}" -password="${item.password || ''}" -target="${item.target || ''}" -target_type="${item.target_type || 'all'}"` }];
   }
   return [];
 }

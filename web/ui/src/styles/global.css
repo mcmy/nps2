@@ -348,6 +348,36 @@ tbody tr:last-child td { border-bottom: 0; }
 .field.full { grid-column: 1 / -1; }
 .field label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 650; }
 .field small { display: block; color: var(--muted); font-size: 10px; line-height: 1.45; margin-top: 5px; }
+.captcha-row { display: grid; grid-template-columns: minmax(0, 1fr) 112px; gap: 8px; align-items: stretch; }
+.captcha-refresh {
+  min-height: 38px;
+  padding: 0 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: #f8fafb;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+.captcha-refresh:hover { border-color: var(--brand); background: #fff; }
+.captcha-refresh:active { transform: scale(.97); }
+.captcha-refresh:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 22%, transparent); outline-offset: 1px; }
+.captcha-image {
+  width: 80px;
+  height: 36px;
+  display: block;
+  border-radius: 4px;
+  background: #f8fafb;
+  filter: contrast(1.18) saturate(.9);
+}
+[data-theme='dark'] .captcha-refresh {
+  background: #f3f6f8;
+  border-color: #72828a;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 8%);
+}
+[data-theme='dark'] .captcha-refresh:hover { background: #fff; border-color: #8fb8c8; }
+[data-theme='dark'] .captcha-image { background: #f3f6f8; filter: contrast(1.28) saturate(.85); }
 .mode-field { grid-column: 1 / -1; }
 .mode-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .mode-option { min-width: 0; min-height: 66px; padding: 11px 13px; display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); cursor: pointer; transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease; }
@@ -380,10 +410,16 @@ tbody tr:last-child td { border-bottom: 0; }
 .detail-grid dd span { min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
 .detail-grid .icon-btn { width: 28px; min-height: 28px; margin-left: auto; flex: 0 0 auto; border-color: transparent; background: transparent; }
 .command-list { display: grid; gap: 8px; }
-.command-list > div { min-width: 0; min-height: 48px; padding: 8px 8px 8px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); display: grid; grid-template-columns: 52px minmax(0, 1fr) 32px; align-items: center; gap: 8px; }
-.command-list span { color: var(--muted); font-size: 10px; font-weight: 700; }
-.command-list code { min-width: 0; overflow-x: auto; padding: 5px 0; white-space: nowrap; font-size: 11px; }
-.command-list .icon-btn { width: 30px; min-height: 30px; border-color: transparent; background: transparent; }
+.command-item { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); overflow: hidden; }
+.command-item summary { min-height: 48px; padding: 8px 12px; display: grid; grid-template-columns: auto minmax(0, 1fr) 16px; align-items: center; gap: 8px; cursor: pointer; list-style: none; }
+.command-item summary::-webkit-details-marker { display: none; }
+.command-label { color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.command-item summary code { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.command-toggle { color: var(--muted); transition: transform .18s ease; }
+.command-item[open] .command-toggle { transform: rotate(180deg); }
+.command-body { min-width: 0; padding: 0 12px 12px; display: grid; grid-template-columns: minmax(0, 1fr) 30px; gap: 8px; align-items: start; }
+.command-body code { min-width: 0; overflow-x: auto; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); white-space: nowrap; font-size: 11px; }
+.command-body .icon-btn { width: 30px; min-height: 30px; border-color: transparent; background: transparent; }
 .control-list { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .control-item { min-width: 0; min-height: 44px; padding: 7px 10px 7px 12px; border: 0; border-bottom: 1px solid var(--line); background: var(--surface); color: var(--text); display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
 .control-item:nth-child(odd) { border-right: 1px solid var(--line); }

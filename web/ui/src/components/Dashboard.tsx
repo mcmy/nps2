@@ -25,10 +25,15 @@ export default function Dashboard({ discovery, notify }: { discovery: Discovery;
     try {
       const response = await request<AnyRecord>(overviewURL);
       const legacy = response.data || response;
+      const display = legacy.display || {};
       setData({
         registration: { version: legacy.version, counts: { clients: legacy.clientCount, online_clients: legacy.clientOnlineCount, tunnels: Number(legacy.tcpC || 0) + Number(legacy.udpCount || 0) + Number(legacy.secretCount || 0) + Number(legacy.socks5Count || 0) + Number(legacy.p2pCount || 0) + Number(legacy.httpProxyCount || 0), hosts: legacy.hostCount } },
         usage_snapshot: { summary: { total_in_bytes: legacy.inletFlowCount, total_out_bytes: legacy.exportFlowCount } },
-        display: { http_proxy_port: legacy.httpProxyPort, https_proxy_port: legacy.httpsProxyPort },
+        display: {
+          ...display,
+          http_proxy_port: display.http_proxy_port || legacy.httpProxyPort,
+          https_proxy_port: display.https_proxy_port || legacy.httpsProxyPort,
+        },
       });
       setRuntime(legacy);
       setUpdatedAt(Date.now());
