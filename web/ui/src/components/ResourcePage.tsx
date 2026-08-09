@@ -363,7 +363,7 @@ function runtimeFields(resource: string, item: AnyRecord) {
     { name: 'service_out_bytes', label: '发送流量', value: formatBytes(Number(item.service_out_bytes || 0)) },
     { name: 'now_rate_total_bps', label: '实时速率', value: `${formatBytes(Number(item.now_rate_total_bps || 0), true)}/s` },
   );
-  if (resource === 'hosts') fields.push({ name: 'cert_expire_at', label: '证书到期时间', value: item.cert_expire_at ? new Date(Number(item.cert_expire_at) * 1000).toLocaleString() : '-' });
+  if (resource === 'hosts') fields.push({ name: 'cert_expire_at', label: '证书到期时间', value: formatDateTime(item.cert_expire_at) });
   return fields;
 }
 
@@ -431,6 +431,21 @@ function formatTimestamp(value: number) {
   return value ? new Date(value * 1000).toLocaleString() : '-';
 }
 
+function parseTimeValue(value: unknown) {
+  if (value === undefined || value === null) return null;
+  const raw = String(value).trim();
+  if (!raw || raw.startsWith('0001-01-01')) return null;
+  const numeric = Number(raw);
+  const date = Number.isFinite(numeric) && numeric > 0 && /^\d+$/.test(raw) ? new Date(numeric * 1000) : new Date(raw);
+  if (Number.isNaN(date.getTime()) || date.getFullYear() <= 1) return null;
+  return date;
+}
+
+function formatDateTime(value: unknown, empty = '-', options?: Intl.DateTimeFormatOptions) {
+  const date = parseTimeValue(value);
+  return date ? date.toLocaleString([], options) : empty;
+}
+
 function Field({ field, value, options }: { field: FieldSpec; value: any; options?: SelectOption[] }) {
   const { t } = useI18n();
   if (field.type === 'checkbox') return <div className={`field ${field.full ? 'full' : ''}`}><div className="check-field"><input id={`field-${field.name}`} name={field.name} type="checkbox" defaultChecked={!!value} /><label htmlFor={`field-${field.name}`}>{t(field.label)}</label></div>{field.help && <small>{t(field.help)}</small>}</div>;
@@ -461,7 +476,7 @@ function renderCell(item: AnyRecord, key: string, kind = '', t: (value: string) 
     return <span className={`badge ${enabled ? 'ok' : 'off'}`}>{t(enabled ? '正常' : '停用')}</span>;
   }
   if (kind === 'bytes') return <span className="mono">{formatBytes(Number(value || 0), key.includes('rate'))}{key.includes('rate') && '/s'}</span>;
-  if (kind === 'time') return value ? new Date(Number(value) * 1000).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : t('无限制');
+  if (kind === 'time') return formatDateTime(value, t('无限制'), { dateStyle: 'short', timeStyle: 'short' });
   if (kind === 'client') return String(item.client?.remark || value || '-');
   if (kind === 'mono' || kind === 'id' || kind === 'number') return <span className="mono">{String(value ?? '-')}</span>;
   if (kind === 'mode') return <span className="badge mode-badge">{modeLabel(value, t)}</span>;
@@ -536,6 +551,8 @@ function cloneItem(item: AnyRecord, resource: string) {
   const clone = { ...item };
   for (const key of ['id', 'revision', 'updated_at', 'read_only', 'run_status', 'is_connect', 'is_close', 'status', 'total_bytes', 'service_total_bytes', 'now_conn', 'now_rate_total_bps']) delete clone[key];
   if (resource === 'tunnels') clone.port = 0;
+  delete clone.expire_at;
+  if (clone.flow && typeof clone.flow === 'object') clone.flow = { ...clone.flow, time_limit: '' };
   return clone;
 }
 

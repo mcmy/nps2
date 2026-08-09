@@ -172,6 +172,7 @@ export function valueFor(item: AnyRecord | null, field: FieldSpec) {
     if (field.name === 'server_ip') return '0.0.0.0';
     if (field.name === 'scheme' || field.name === 'target_type') return 'all';
     if (field.name === 'mode') return 'tcp';
+    if (field.name === 'client_id') return '';
     return field.type === 'number' || field.type === 'select' ? 0 : '';
   }
   const config = item.config || item.cnf;
@@ -195,10 +196,13 @@ export function valueFor(item: AnyRecord | null, field: FieldSpec) {
 }
 
 function unixToLocal(value: number | string) {
-  if (!value) return '';
-  const numeric = Number(value);
-  const date = Number.isFinite(numeric) && numeric > 0 && /^\d+$/.test(String(value)) ? new Date(numeric * 1000) : new Date(String(value));
+  if (value === undefined || value === null) return '';
+  const raw = String(value).trim();
+  if (!raw || raw.startsWith('0001-01-01')) return '';
+  const numeric = Number(raw);
+  const date = Number.isFinite(numeric) && numeric > 0 && /^\d+$/.test(raw) ? new Date(numeric * 1000) : new Date(raw);
   if (Number.isNaN(date.getTime())) return '';
+  if (date.getFullYear() <= 1) return '';
   const offset = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 }
